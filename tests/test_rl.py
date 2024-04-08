@@ -1,7 +1,7 @@
 import gym
-from ai_dm.environments.gym_envs.gym_problem import GymProblem
-from ai_dm.rl.q_learning import q_learning
-import ai_dm.core.comp_resources as comp_resources
+from aidm.environments.gym_envs.gym_problem import GymProblem
+from aidm.rl.q_learning import q_learning
+import aidm.core.comp_resources as comp_resources
 
 
 

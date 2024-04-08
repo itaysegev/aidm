@@ -1,7 +1,7 @@
 __author__ = 'sarah'
 
-from ai_dm.core.problem import ProblemP,ProblemS
-import ai_dm.search.utils as utils
+from aidm.core.problem import ProblemP,ProblemS
+import aidm.search.utils as utils
 
 # Wrapping Gymnasium problems for which the probability function P can be accessed.
 # Examples include taxi, frozen_lake and Cliff Walking

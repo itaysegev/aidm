@@ -1,12 +1,12 @@
 import gym
-from ai_dm.environments.gym_envs.gym_problem import GymProblem
-from ai_dm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
-import ai_dm.search.mcts as mcts
-import ai_dm.search.utils as utils
-import ai_dm.search.defs as defs
-import ai_dm.search.heuristic as heuristic
+from aidm.environments.gym_envs.gym_problem import GymProblem
+from aidm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
+import aidm.search.mcts as mcts
+import aidm.search.utils as utils
+import aidm.search.defs as defs
+import aidm.search.heuristic as heuristic
 
-import ai_dm.core.comp_resources as comp_resources
+import aidm.core.comp_resources as comp_resources
 
 
 

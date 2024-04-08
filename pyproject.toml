@@ -1,3 +1,33 @@
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["version", "dependencies"]
+name = "aidm"
+authors = [
+    { name = "Sarah Keren", email = "sarahk@cs.technion.ac.il" },
+    { name = "Guy Azran", email = "guy.azran@campus.technion.ac.il" },
+]
+description = "A package for AI sequential decision-making"
+keywords = ["Artificial Intelligence", "Decision-Making", "Classical Planning", "Machine Learning"]
+readme = "README.md"
+requires-python = ">= 3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python"
+]
+license = { file = "LICENSE.txt" }
+
+[tool.setuptools.dynamic]
+version = { attr = "aidm.__version__" }
+dependencies = { file = ["requirements.txt"] }
+
+[project.optional-dependencies]
+gym = ["gymnasium"]
+
+[project.urls]
+Repository = "https://github.com/CLAIR-LAB-TECHNION/aidm"
+
+[tool.setuptools.packages.find]
+exclude = ['tests']

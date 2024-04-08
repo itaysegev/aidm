@@ -1,7 +1,7 @@
 __author__ = 'sarah'
 
-from ai_dm.core.problem import Problem
-import ai_dm.search.utils as utils
+from aidm.core.problem import Problem
+import aidm.search.utils as utils
 
 class GymProblem(Problem):
 

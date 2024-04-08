@@ -1,9 +1,9 @@
 __author__ = 'sarah'
 
-import ai_dm.search.utils as utils
-import ai_dm.search.defs as defs
-import ai_dm.search.heuristic as heuristic
-import ai_dm.search.constraint as constraint
+import aidm.search.utils as utils
+import aidm.search.defs as defs
+import aidm.search.heuristic as heuristic
+import aidm.search.constraint as constraint
 import logging, time
 
 # TODO: take care of logs
