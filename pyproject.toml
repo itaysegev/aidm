@@ -25,6 +25,7 @@ dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
 gym = ["gymnasium"]
+pddl = ["pddlgymnasium@git+https://github.com/CLAIR-LAB-TECHNION/pddlgymnasium"]
 
 [project.urls]
 Repository = "https://github.com/CLAIR-LAB-TECHNION/aidm"
