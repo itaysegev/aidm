@@ -6,30 +6,25 @@ __author__ = 'sarah'
 import collections, queue
 import bisect
 
+import logging
+from typing import TypedDict, Any
+
+logger = logging.getLogger('aidm-logger')
+
+
 from abc import ABC, abstractmethod
 
 
-class State:
+class Action(TypedDict):
+    key: Any  # a hashable and equatable value for identifying unique states
+    value: Any  # the actual action value indiginous to the specific problem/env
 
-    """State superclass
-    """
-    def __init__(self, key, is_terminal=False):
-        self.key = key
-        self.is_terminal = is_terminal
-
-    def get_key(self):
-        return self.key
-
-    def __str__(self):
-        return self.key
-
-    def __repr__(self):
-        return self.key
-
-    def is_terminal(self):
-        return self.is_terminal
+class State(TypedDict):
+    key: Any
+    value: Any
 
 
+# TODO: take care of transition function and the duplication of env for each node (and for the termination criteria)
 class Node:
     """A node in a search tree. Contains a pointer to the parent (the node
     that this is a successor of) and to the actual content for this node.
@@ -38,16 +33,14 @@ class Node:
     an explanation of how the f and h values are handled. You will not need to
     subclass this class."""
 
-    def __init__(self, state, parent, action, path_cost, info=None):
+    def __init__(self, state, action, parent=None):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
         self.parent = parent
         self.action = action
-        self.path_cost = path_cost
         self.depth = 0
         if parent:
             self.depth = parent.depth + 1
-        self.info = info
 
     def __repr__(self):
         return "<Node {}>".format(self.state.__str__())
@@ -55,23 +48,7 @@ class Node:
     def __lt__(self, node):
         return self.state.get_key() < node.state.get_key()
 
-    def expand(self, problem):
-        """List the nodes reachable in one step from this node."""
-        return [self.child_node(problem, action)
-                for action in problem.actions(self.state)]
-
-    def child_node(self, problem, action):
-        """[Figure 3.10]"""
-        next = problem.result(self.state, action)
-        return Node(next, self, action,
-                    problem.path_cost(self.path_cost, self.state,
-                                      action, next))
-
-    def solution(self):
-        """Return the sequence of actions to go from the root to this node."""
-        return [node.action for node in self.path()[1:]]
-
-    def path(self):
+    def get_path(self):
         """Return a list of nodes forming the path from the root to this node."""
         node, path_back = self, []
         while node:
@@ -80,7 +57,7 @@ class Node:
         return list(reversed(path_back))
 
     def get_transition_path(self):
-        """Return a list of transitions forming the execution path from the root to this node."""
+        """Return a list of transitions (actions) forming the execution path from the root to this node."""
         node, path_back = self, []
         while node:
             path_back.append(node.action)
@@ -107,7 +84,7 @@ class Node:
         while node:
             path_back.append(node)
             if node.action is not None:
-                cost = cost + problem.get_action_cost(node.action, node.state)
+                cost = cost + problem.get_cost(node.action, node.state)
             node = node.parent
         return [cost, list(reversed(path_back))]
 
@@ -118,7 +95,7 @@ class Node:
         while node:
             path_back.append(node)
             if node.action is not None:
-                value = value + problem.get_action_value(node.action, node.state)
+                value = value + problem.get_value(node.action, node.state)
             node = node.parent
         return [value, list(reversed(path_back))]
 
@@ -136,7 +113,7 @@ class Node:
 
 class Container(ABC):
 
-    """Queue is an abstract class/interface. There are three types:
+    """Container is an abstract class/interface. There are three types:
         Stack(): A Last In First Out Queue.
         FIFOQueue(): A First In First Out Queue.
         PriorityQueue(order, f): Queue in sorted order (default min-first).
@@ -363,17 +340,3 @@ class EvaluationCriteriaGoalCondition(EvaluationCriteria):
     def __str__(self):
         raise NotImplementedError
 
-
-
-
-
-
-def apply_constraints(constraints, unfiltered_list):
-    filtered_group = []
-    for element in unfiltered_list:
-        # iterate through the constraints to see if the current action or successor states violate them
-        for constraint in constraints:
-            if constraint.is_valid(element):
-                filtered_group.append(element)
-
-    return filtered_group

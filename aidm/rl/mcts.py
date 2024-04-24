@@ -1,9 +1,4 @@
-import aidm.search.utils as utils
-import aidm.search.defs as defs
-import aidm.search.heuristic as heuristic
-import aidm.search.constraint as constraint
-import logging, time
-
+import aidm.core.utils as utils
 
 # based on code from https://ai-boson.github.io/mcts/
 import numpy as np
@@ -12,7 +7,7 @@ from collections import defaultdict
 class MCTSNode(utils.Node):
 
     def __init__(self, state, applicable_actions, parent=None, action=None, path_cost=0, info=None, parent_action=None):
-        super().__init__(state, parent, action, path_cost, info)
+        super().__init__(state, action, parent)
         self.parent_action = parent_action
         # todo: support settings with continous spaces
         self.children = []

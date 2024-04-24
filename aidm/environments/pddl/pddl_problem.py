@@ -1,7 +1,7 @@
 from pddlgymnasium.core import PDDLEnv
 
 from ...core.problem import Problem
-from ...search import utils
+from ...core import utils
 
 
 class PDDLProblem(Problem):
@@ -38,8 +38,7 @@ class PDDLProblem(Problem):
             info['prob'] = prob
             info['reward'] = reward
             next_state = utils.State(next_state_key, done)
-            successor_node = utils.Node(state=next_state, parent=node, action=action,
-                                        path_cost=node.path_cost + action_cost, info=info)
+            successor_node = utils.Node(state=next_state, action=action, parent=node)
             successor_nodes.append(successor_node)
 
         return successor_nodes
