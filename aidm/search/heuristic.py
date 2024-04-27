@@ -14,19 +14,19 @@ def get_heuristic(heuristic_name, problem):
         return heur.get_heur_val
 
 
-def zero_heuristic(node):
+def zero_heuristic(node,problem):
     return 0
 
 
-def greedy_heuristic(node):
+def greedy_heuristic(node,problem):
     if node.parent is None:
         return 0
     else:
         return 1
 
 
-def goal_heuristic(node):
-    if node.state.is_terminal:
+def goal_heuristic(node,problem):
+    if problem.is_goal_state(node.state):
         return 0
     else:
         return 1

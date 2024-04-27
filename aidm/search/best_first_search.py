@@ -24,7 +24,7 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     root_node = Node(state=problem.get_current_state(),action=None, parent=None)
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
-    frontier.add(root_node)
+    frontier.add(root_node, problem)
     # keeping the best solution found so far
     best_node = None
     best_value = None
@@ -87,7 +87,7 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
 
             # add successors to the frontier
             for child in successors:
-                frontier.add(child)
+                frontier.add(child,problem)
 
         # search graph fully explored without finding a solution
         if logging: logger.info('best_first_search: search graph fully explored without finding a solution')

@@ -24,7 +24,7 @@ class Node:
         return "<Node {}>".format(self.state.__str__())
 
     def __lt__(self, node):
-        return self.state.get_key() < node.state.get_key()
+        return self.state['key'] < node.state['key']
 
     def get_node_path(self):
         """Return a list of nodes forming the path from the root to this node."""

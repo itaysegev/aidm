@@ -5,7 +5,8 @@ __author__ = 'sarah'
 
 import logging
 logger = logging.getLogger('aidm-logger')
-logging.basicConfig(filename='aidm.log', encoding='utf-8', level=logging.DEBUG)
+handlers = [logging.FileHandler('aidm.log'), logging.StreamHandler()]
+logging.basicConfig(level = logging.DEBUG, handlers = handlers)
 
 
 from typing import TypedDict, Any

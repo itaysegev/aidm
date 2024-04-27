@@ -22,7 +22,7 @@ class Container(ABC):
 
 
     @abstractmethod
-    def add(self, item, check_existance=False):
+    def add(self, item, problem=None, check_existance=False):
         pass
 
     @abstractmethod
@@ -54,7 +54,7 @@ class Queue(Container):
     def __init__(self, queue, max_len=None):
         super().__init__(queue, max_len)
 
-    def add(self, item, check_existance=False):
+    def add(self, item, problem=None, check_existance=False):
 
         if check_existance and self.__contains__(item):
             return
@@ -106,9 +106,9 @@ class PriorityQueue(Queue):
         super().__init__(queue.PriorityQueue(), max_len)
         self.eval_func = eval_func
 
-    def add(self, node):
-        eval_value = self.eval_func(node)
-        super().add((eval_value, node))
+    def add(self, item, problem, check_existance=True):
+        eval_value = self.eval_func(item,problem)
+        super().add((eval_value, item, check_existance))
 
     def extract(self):
         return self.container.get()[1]
