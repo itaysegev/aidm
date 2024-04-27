@@ -1,5 +1,5 @@
 #from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
-import aidm.search.frontier
+from aidm.search.frontier import PriorityQueue
 from aidm.environments.pddl.pddl_problem import PDDLProblem
 from aidm.search.best_first_search import best_first_search, breadth_first_search
 import aidm.core.utils as utils
@@ -44,20 +44,19 @@ def test_pddl_search():
     # create a wrapper of the environment to the search
     problem = PDDLProblem(domain_file=DOMAIN, problem_file=PROBLEM)
     # perform best_first_serch
-    '''
+
     [best_node, best_plan, resources] = breadth_first_search(problem=problem,
                                                           iter_limit=1000,
                                                           logging=True)
-    '''
     [best_node, best_plan, resources] = best_first_search(problem=problem,
-                                                                      frontier=aidm.search.frontier.FIFOQueue(),#PriorityQueue(eval_func=zero_heuristic),
-                                                                      termination_criteria=utils.CriteriaGoalState(),
-                                                                      prune_func=None,
-                                                                      closed_list=None,#utils.ClosedList(),
-                                                                      is_anytime = False,
-                                                                      iter_limit=10000,
-                                                                      time_limit=None,
-                                                                      logging=True)
+                                                          frontier=PriorityQueue(eval_func=zero_heuristic),  #aidm.search.frontier.FIFOQueue(),
+                                                          termination_criteria=utils.CriteriaGoalState(),
+                                                          prune_func=None,
+                                                          closed_list=None,  #utils.ClosedList(),
+                                                          is_anytime = False,
+                                                          iter_limit=10000,
+                                                          time_limit=None,
+                                                          logging=True)
 
     if best_plan:
         print('best_plan:')

@@ -1,6 +1,5 @@
-import queue
+import queue, heapq
 from abc import ABC, abstractmethod
-
 
 class Container(ABC):
 
@@ -15,11 +14,6 @@ class Container(ABC):
         len(q)          -- number of items in q (also q.__len())
         item in q       -- does q contain item?
      """
-    def __init__(self, container, max_len=None):
-
-        self.container = container
-        self.max_len = max_len
-
 
     @abstractmethod
     def add(self, item, problem=None, check_existance=False):
@@ -33,54 +27,29 @@ class Container(ABC):
     def __len__(self):
         pass
 
-    @abstractmethod
-    def __contains__(self, item):
-        pass
-
-    @abstractmethod
-    def __repr__(self, key):
-        pass
-
     def is_empty(self):
-        len = self.__len__()
-        if len == 0:
-            return True
-        else:
-            return False
+        return True if self.__len__()==0 else False
 
 
 class Queue(Container):
 
     def __init__(self, queue, max_len=None):
-        super().__init__(queue, max_len)
+        self.queue = queue
+        self.max_len = max_len
 
     def add(self, item, problem=None, check_existance=False):
-
         if check_existance and self.__contains__(item):
             return
-
         if not self.max_len or self.__len__() < self.max_len:
-            self.container.put(item)
+            self.queue.put(item)
         else:
             raise Exception('FIFOQueue is full')
 
     def extract(self):
-        return self.container.get()
+        return self.queue.get()
 
     def __len__(self):
-        return self.container.qsize()
-
-    #todo: check if this works
-    def __contains__(self, item):
-        return item in self.container.queue
-
-    def __repr__(self):
-        queue_string = ''
-        for item in self.container:
-            queue_string+= ' '
-            queue_string+= item
-
-        return queue_string
+        return self.queue.qsize()
 
 
 class FIFOQueue(Queue):
@@ -97,18 +66,18 @@ class LIFOQueue(Queue):
 
 class PriorityQueue(Queue):
 
-    """A queue in which the minimum (or maximum) element (as determined by f and
-    order) is returned first. If order is min, the item with minimum f(x) is
-    returned first; if order is max, then it is the item with maximum f(x).
-    Also supports dict-like lookup."""
-
     def __init__(self, eval_func=lambda x: x, max_len=None):
-        super().__init__(queue.PriorityQueue(), max_len)
+        super().__init__(queue=[],max_len=max_len)
         self.eval_func = eval_func
+        self._index = 0
 
     def add(self, item, problem, check_existance=True):
-        eval_value = self.eval_func(item,problem)
-        super().add((eval_value, item, check_existance))
+        priority = self.eval_func(item,problem)
+        heapq.heappush(self.queue, (-priority, self._index, item))
+        self._index += 1
 
     def extract(self):
-        return self.container.get()[1]
+        return heapq.heappop(self.queue)[-1]
+
+    def __len__(self):
+        return len(self.queue)
