@@ -1,10 +1,13 @@
-from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
+#from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
+import aidm.search.frontier
+from aidm.environments.pddl.pddl_problem import PDDLProblem
 from aidm.search.best_first_search import best_first_search
 import aidm.core.utils as utils
 
 import gymnasium as gym
+from pddl import DOMAIN,PROBLEM
 
-def test_search():
+def test_gym_search():
     # define the environment
     taxi_env= gym.make('Taxi-v3',render_mode='human')
 
@@ -21,10 +24,10 @@ def test_search():
 
     # perform best_first_serch
     [best_value, best_node, best_plan, explored_count, ex_terminated] = best_first_search(problem=problem,
-                                                                                          frontier=utils.FIFOQueue(),
-                                                                                          closed_list=utils.ClosedListOfKeys(),
-                                                                                          termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                                                                                          frontier=aidm.search.frontier.FIFOQueue(),
+                                                                                          termination_criteria=utils.CriteriaGoalState(),
                                                                                           prune_func=None,
+                                                                                          closed_list=utils.ClosedList(),
                                                                                           iter_limit=None,
                                                                                           time_limit=None,
                                                                                           logging=False)
@@ -32,7 +35,31 @@ def test_search():
     problem.apply_plan(plan=best_plan,render=True)
 
 
+def test_pddl_search():
 
+
+
+    # create a wrapper of the environment to the search
+    problem = PDDLProblem(domain_file=DOMAIN, problem_file=PROBLEM)
+    # perform best_first_serch
+    [best_node, best_plan, resources] = best_first_search(problem=problem,
+                                                                      frontier=aidm.search.frontier.FIFOQueue(),
+                                                                      termination_criteria=utils.CriteriaGoalState(),
+                                                                      prune_func=None,
+                                                                      closed_list=utils.ClosedList(),
+                                                                      is_anytime = False,
+                                                                      iter_limit=None,
+                                                                      time_limit=None,
+                                                                      logging=True)
+
+    if best_plan:
+        print('best_plan:')
+        for action in best_plan:
+            print(action)
+        env = problem.get_env()
+        env.apply_plan(plan=best_plan,render=True)
+    else:
+        print('no plan fround')
 
 if __name__ == "__main__":
-    test_search()
+    test_pddl_search()

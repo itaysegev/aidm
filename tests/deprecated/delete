@@ -1,0 +1,77 @@
+
+    def get_path_cost(self, problem:Problem):
+        """Return the total cost of the list of nodes forming the path from the root to this node."""
+        node, path_back = self, []
+        cost = 0
+        while node:
+            path_back.append(node)
+            if node.action is not None:
+                cost = cost + problem.get_cost(node.action, node.state)
+            node = node.parent
+        return [cost, list(reversed(path_back))]
+
+    def get_path_value(self, problem):
+        """Return the total value pf the list of states forming the path from the root to this node."""
+        node, path_back = self, []
+        value = 0
+        while node:
+            path_back.append(node)
+            if node.action is not None:
+                value = value + problem.get_value(node.action, node.state)
+            node = node.parent
+        return [value, list(reversed(path_back))]
+
+
+
+class EvaluationCriteria(ABC):
+
+    @abstractmethod
+    def is_better_or_equal(self, value_a, node_a, value_b, node_b, problem):
+        pass
+
+
+class EvaluationCriteriaGoalCondition(EvaluationCriteria):
+
+    def is_better_or_equal(self, value_a, node_a, value_b, node_b, problem):
+
+        if node_a.state.is_terminal:
+            if not node_b or not node_b.state.is_terminal or node_b.state.is_terminal and problem.is_better_or_equal(value_a, value_b) :
+                return True
+
+        return False
+
+    def __str__(self):
+        raise NotImplementedError
+
+
+
+
+class ClosedListOfSequences(ClosedList):
+
+    ''' Holding the list of items that have been explored '''
+    def __init__(self):
+        self.closed_list = set()
+
+    def add(self, node):
+        self.closed_list.add(node.transition_path())
+
+    def is_in_list(self, node):
+        return node.transition_path() in self.closed_list
+
+class ClosedListOfSets(ClosedList):
+    ''' Holding the list of items that have been explored
+    '''
+    def __init__(self):
+        self.closed_list = set()
+
+    def add(self, node):
+        sequence = node.transition_path()
+        sorted_sequence = tuple(sorted(sequence))
+        self.closed_list.add(sorted_sequence)
+
+    def is_in_list(self, node):
+        sequence = node.transition_path()
+        sorted_sequence = tuple(sorted(sequence))
+        return sorted_sequence in self.closed_list
+
+

@@ -6,9 +6,13 @@ from ..core.utils import State, Action
 
 class Problem (ABC):
 
+    @abstractmethod
+    def get_applicable_actions(self, state:State)-> list[Action]:
+        pass
+
     # return the successors that will result from applying the action (without changing the state) and their associated probability
     @abstractmethod
-    def _get_successors(self, action: Action, state: State) -> list[tuple[State, Action, float]]:
+    def _get_successors(self, state: State, action: Action) -> list[tuple[State, float]]:
         """
         Args:
             action - the action to perform at the current state
@@ -19,25 +23,57 @@ class Problem (ABC):
         """
         pass
 
-    def get_successors(self, action: Action, state: State) -> list[tuple[State, float]]:
-        """same here"""
-        out = self._get_successors(action, state)
-        probs = [p for _, _, p in out]
-        assert sum(probs) == 1, 'probabilities in successors must sum to 1'
-        return out
-        # for more complex situations, we can use np.close(sum(probs), 1)
-
     @abstractmethod
-    def get_cost(self, state, action=None, next_state=None):
+    def get_cost(self, state: State, action: Action = None, next_state: State = None):
         pass
 
     @abstractmethod
-    def get_value(self, state, action=None, next_state=None):
+    def get_value(self, state: State, action=None, next_state=None):
         pass
 
     @abstractmethod
     def is_goal_state(self, state:State):
         pass
 
-    def sample_applicable_actions_at_state(self, state:State, sample_size:int):
+    @abstractmethod
+    def get_current_state(self)->State:
         pass
+
+    @abstractmethod
+    def get_state_key(self, state:State):
+        pass
+
+    @abstractmethod
+    def get_action_key(self, action: Action):
+        pass
+
+    @abstractmethod
+    def is_better(self, value_a, value_b)->bool:
+        pass
+
+    def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
+        if action:
+            out = self._get_successors(state, action)
+            probs = [p for _, _, p in out]
+            assert sum(probs) == 1, 'probabilities in successors must sum to 1'
+        else:
+            out = []
+            for action in self.get_applicable_actions(state=state):
+                cur=self._get_successors(state, action)
+                probs = [p for _, p in cur]
+                assert sum(probs) == 1, 'probabilities in successors must sum to 1'
+                out.append([action,cur])
+        return out
+
+        # for more complex situations, we can use np.close(sum(probs), 1)
+
+
+    def evaluate(self,path:list[State,Action,State]):
+        value = 0
+        for state,action,next_state in path:
+            if action:
+                value += self.get_value(state,action,next_state)
+        return value
+
+
+

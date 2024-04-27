@@ -1,22 +1,17 @@
 from abc import ABC, abstractmethod
 
-from .problem import Problem
-from ..core.utils import Action, State
-
 
 class Env(ABC):
-    def __init__(self, problem: Problem):
-        self.problem = problem
 
     @abstractmethod
-    def get_current_state(self) -> State:
+    def get_current_state(self):
         """
 
         """
         pass
 
     @abstractmethod
-    def apply_action(self, action: Action) -> State:
+    def apply_action(self, action):
         """
 
         """
@@ -32,7 +27,7 @@ class Env(ABC):
     def render(self):
         pass
 
-    def apply_plan(self, plan: list[Action], render=False):
+    def apply_plan(self, plan, render=False):
         if render:
             self.render()
         for action in plan:

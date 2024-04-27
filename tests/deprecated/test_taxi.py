@@ -1,5 +1,7 @@
 import gym
 from aidm.environments.gym_envs.gym_problem import GymProblem
+
+import aidm.search.frontier
 from aidm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, a_star, depth_first_search_l
 import aidm.rl.mcts as mcts
 import aidm.core.utils as utils
@@ -34,10 +36,10 @@ def main_taxi_bfs():
 
     # perform BFS
     [best_value, best_node, best_plan, explored_count, ex_terminated] = best_first_search(problem=taxi_p,
-                                                                                          frontier=utils.FIFOQueue(),
-                                                                                          closed_list=utils.ClosedListOfKeys(),
-                                                                                          termination_criteria=utils.TerminationCriteriaGoalStateReached(),
-                                                                                          prune_func=None)
+                                                                                          frontier=aidm.search.frontier.FIFOQueue(),
+                                                                                          termination_criteria=utils.CriteriaGoalState(),
+                                                                                          prune_func=None,
+                                                                                          closed_list=utils.ClosedListOfKeys())
     print(best_plan)
     for action_id in best_plan:
         taxi_p.apply_action(action_id)
@@ -183,11 +185,11 @@ def main_taxi_a_star():
 
     # perform A*
     [best_value, best_node, best_plan, explored_count, ex_terminated] = best_first_search(problem=taxi_p,
-                                                                                          frontier=utils.PriorityQueue(
+                                                                                          frontier=aidm.search.frontier.PriorityQueue(
                                                                                               heuristic.zero_heuristic),
-                                                                                          closed_list=utils.ClosedListOfKeys(),
-                                                                                          termination_criteria=utils.TerminationCriteriaGoalStateReached(),
-                                                                                          prune_func=None)
+                                                                                          termination_criteria=utils.CriteriaGoalState(),
+                                                                                          prune_func=None,
+                                                                                          closed_list=utils.ClosedListOfKeys())
     print(best_plan)
     for action_id in best_plan:
         taxi_p.apply_action(action_id)
@@ -235,9 +237,9 @@ def main_test():
     copy_p = GymProblem(copy_env)
 
     # perform BFS
-    optimal_path = best_first_search(problem=copy_p, frontier=utils.FIFOQueue(),
-                                     closed_list=utils.ClosedListOfSequences(),
-                                     termination_criteria=utils.TerminationCriteriaGoalStateReached(), prune_func=None)
+    optimal_path = best_first_search(problem=copy_p, frontier=aidm.search.frontier.FIFOQueue(),
+                                     termination_criteria=utils.CriteriaGoalState(), prune_func=None,
+                                     closed_list=utils.ClosedListOfSequences())
     print(optimal_path)
 
 
