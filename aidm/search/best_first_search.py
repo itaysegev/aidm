@@ -25,10 +25,6 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
     frontier.add(root_node, problem)
-    # keeping the best solution found so far
-    best_node = None
-    best_value = None
-    best_plan = None
     # keep track of search resources
     resources=ComputationalResources(iteration_bound=iter_limit, time_bound=time_limit)
 
@@ -41,7 +37,7 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
             resources.update()
             if resources.are_exhausted():
                 if logging: logger.info('best_first_search: resources exhausted')
-                if is_anytime:
+                if is_anytime and best_node:
                     return [best_node, best_plan, resources]
                 else:
                     return [None, None, resources]
