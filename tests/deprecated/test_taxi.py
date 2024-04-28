@@ -38,8 +38,7 @@ def main_taxi_bfs():
     [best_value, best_node, best_plan, explored_count, ex_terminated] = best_first_search(problem=taxi_p,
                                                                                           frontier=aidm.search.frontier.FIFOQueue(),
                                                                                           termination_criteria=utils.CriteriaGoalState(),
-                                                                                          prune_func=None,
-                                                                                          closed_list=utils.ClosedListOfKeys())
+                                                                                          prune_func=None)
     print(best_plan)
     for action_id in best_plan:
         taxi_p.apply_action(action_id)
@@ -188,8 +187,7 @@ def main_taxi_a_star():
                                                                                           frontier=aidm.search.frontier.PriorityQueue(
                                                                                               heuristic.zero_heuristic),
                                                                                           termination_criteria=utils.CriteriaGoalState(),
-                                                                                          prune_func=None,
-                                                                                          closed_list=utils.ClosedListOfKeys())
+                                                                                          prune_func=None)
     print(best_plan)
     for action_id in best_plan:
         taxi_p.apply_action(action_id)
@@ -238,8 +236,7 @@ def main_test():
 
     # perform BFS
     optimal_path = best_first_search(problem=copy_p, frontier=aidm.search.frontier.FIFOQueue(),
-                                     termination_criteria=utils.CriteriaGoalState(), prune_func=None,
-                                     closed_list=utils.ClosedListOfSequences())
+                                     termination_criteria=utils.CriteriaGoalState(), prune_func=None)
     print(optimal_path)
 
 

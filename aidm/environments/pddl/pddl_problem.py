@@ -29,9 +29,6 @@ class PDDLProblem(Problem):
         grounded_actions = self.env.action_space.all_ground_literals(state['content'])
         for action in grounded_actions:
             actions.append(Action(key=self.get_action_key(action),content=action))
-        return actions
-    def get_applicable_actions_at_node(self, node):
-        return self.get_applicable_actions(node.state['content'])
 
     def _get_successors(self, state, action)  -> list[tuple[State, float]]:
         successors = []

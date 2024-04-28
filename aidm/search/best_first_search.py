@@ -5,7 +5,8 @@ from ..core.resources import ComputationalResources
 from ..core.utils import logger, ClosedList, CriteriaGoalState
 from .node import Node
 
-def best_first_search(problem, frontier, termination_criteria=None, prune_func=None, closed_list=None, is_anytime=False, iter_limit=None, time_limit=None, logging=False):
+def best_first_search(problem, frontier, termination_criteria=None, prune_func=None, use_closed_list=False,
+                      is_anytime=False, iter_limit=None, time_limit=None, logging=False, depth_bound=None):
     """Search for an action sequence with maximal value.
        The search problem must specify the following elements:
 
@@ -26,26 +27,29 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
     frontier.add(root_node, problem)
     # keep track of search resources
-    resources=ComputationalResources(iteration_bound=iter_limit, time_bound=time_limit)
+    resources=ComputationalResources(iteration_bound=iter_limit, time_bound=time_limit, depth_bound=depth_bound)
+    #initiliaze closed list if relevant
+    closed_list = ClosedList() if use_closed_list else None
 
     try:
 
         while not frontier.is_empty():
 
+            # get the current node and its value
+            cur_node = frontier.extract()
+            cur_value = problem.evaluate(path=cur_node.get_transition_path())
+            if logging:logger.info('best_first_search resources %s cur_node:%s cur_value:%f' % (resources.__str__(),cur_node.__str__(), cur_value))
+
+
             # update resources (iteration count will advance by 1)
             # check resource limit has not been reached
             resources.update()
-            if resources.are_exhausted():
+            if resources.are_exhausted(node=cur_node):
                 if logging: logger.info('best_first_search: resources exhausted')
                 if is_anytime and best_node:
                     return [best_node, best_plan, resources]
                 else:
                     return [None, None, resources]
-
-            # get the current node and its value
-            cur_node = frontier.extract()
-            cur_value = problem.evaluate(path=cur_node.get_transition_path())
-            if logging:logger.info('best_first_search resources %s cur_node:%s cur_value:%f' % (resources.__str__(),cur_node.__str__(), cur_value))
 
             # if the closed list was specified - check if this state should be explored again
             if closed_list:
@@ -63,10 +67,12 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
                     best_plan  = best_node.get_transition_path_string()
 
             # check if termination criteria had been met - and stop the search if it has
-            if termination_criteria and termination_criteria.isTerminal(cur_node, problem):
-                plan = cur_node.get_transition_path_string()
-                if logging: logger.info('best_first_search: termination_criteria reached with solution %s' % (cur_node.get_transition_path_string()))
-                return [cur_node, plan, resources]
+            if termination_criteria:
+                for criterion in termination_criteria:
+                    if criterion.isTerminal(cur_node, problem):
+                        plan = cur_node.get_transition_path_string()
+                        if logging: logger.info('best_first_search: termination_criteria reached with solution %s' % (cur_node.get_transition_path_string()))
+                        return [cur_node, plan, resources]
 
             # get the succsessor states of the state of the current node
             all_successors = problem.get_successors(state=cur_node.state)
@@ -93,37 +99,38 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
         if logging: logger.info('best_first_search: exception occurred: %s'%str(e))
         raise e
 
-def breadth_first_search(problem, iter_limit=None, time_limit=None, logging=False):
+def breadth_first_search(problem, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
     return best_first_search(problem, frontier=aidm.search.frontier.FIFOQueue(),
-                             termination_criteria= CriteriaGoalState(), prune_func=None,
-                             closed_list=ClosedList(), iter_limit=iter_limit, time_limit=time_limit,
-                             logging=logging)
+                             termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list,is_anytime=False,
+                             iter_limit=iter_limit, time_limit=time_limit, depth_bound=None, logging=logging)
 
-def depth_first_search(problem, iter_limit=None, time_limit=None, logging=False):
+def depth_first_search(problem, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
     return best_first_search(problem, frontier=aidm.search.frontier.LIFOQueue(),
-                             termination_criteria=CriteriaGoalState(), prune_func=None,
-                             closed_list=ClosedList(), iter_limit=iter_limit, time_limit=time_limit,
-                             logging=logging)
+                             termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list, iter_limit=iter_limit,
+                             time_limit=time_limit, depth_bound=None, logging=logging)
 
-def depth_first_search_l(problem, max_depth, iter_limit=None, time_limit=None, logging=False):
-    return best_first_search(problem, frontier=aidm.search.frontier.LIFOQueue(),
-                             termination_criteria=CriteriaGoalState(), prune_func=None,
-                             closed_list=ClosedList(), iter_limit=iter_limit, time_limit=time_limit,
-                             logging=logging)
+def depth_first_search_l(problem, depth_bound:int, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
+    resources=None
+    for l in range(depth_bound):
+        [node, plan, resources] = best_first_search(problem, frontier=aidm.search.frontier.LIFOQueue(),
+                             termination_criteria=[CriteriaGoalState()], prune_func=None,use_closed_list=use_closed_list, iter_limit=iter_limit,
+                             time_limit=time_limit, logging=logging)
+        if plan: return [node, plan, resources]
+    # plan not found
+    return [None, None, resources]
 
-def a_star(problem, heuristic_func, iter_limit=None, time_limit=None, logging=False):
-    #f_func = lambda x: x.get_path_cost(problem)[0]+heuristic_func(x)
+def a_star(problem, heuristic_func, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
+    #f_func is equal to g+h
     f_func = lambda x: problem.evaluate(path=x.get_transition_path())+heuristic_func(x)
     return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(f_func),
-                             termination_criteria=CriteriaGoalState(), prune_func=None,
-                             closed_list=ClosedList(), iter_limit=iter_limit, time_limit=time_limit,
-                             logging=logging)
+                             termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list, iter_limit=iter_limit,
+                             time_limit=time_limit, depth_bound=None, logging=logging)
 
-def greedy_best_first_search(problem, heuristic_func, iter_limit=None, time_limit=None, logging=False):
+def greedy_best_first_search(problem, heuristic_func, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
+    # f_func is equal to h
     return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(heuristic_func),
-                             termination_criteria=CriteriaGoalState(), prune_func=None,
-                             closed_list=ClosedList(), iter_limit=iter_limit, time_limit=time_limit,
-                             logging=logging)
+                             termination_criteria=[CriteriaGoalState()], prune_func=None,use_closed_list=use_closed_list, iter_limit=iter_limit,
+                             time_limit=time_limit, depth_bound=None, logging=logging)
 
 
 

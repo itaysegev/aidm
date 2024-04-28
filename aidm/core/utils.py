@@ -76,3 +76,16 @@ class CriteriaGoalState(Criteria):
             return True
         else:
             return False
+
+
+
+def print_results(info, node, plan, resources):
+    print(info)
+    if plan:
+        print('plan:')
+        for action in plan:
+            print(action)
+    else:
+        print('no plan found')
+    if resources:
+        print('resources:'+str(resources))
