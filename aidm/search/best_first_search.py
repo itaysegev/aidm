@@ -114,7 +114,7 @@ def depth_first_search_l(problem, depth_bound:int, use_closed_list=False, iter_l
     for l in range(depth_bound):
         [node, plan, resources] = best_first_search(problem, frontier=aidm.search.frontier.LIFOQueue(),
                              termination_criteria=[CriteriaGoalState()], prune_func=None,use_closed_list=use_closed_list, iter_limit=iter_limit,
-                             time_limit=time_limit, logging=logging)
+                             time_limit=time_limit, depth_bound=l, logging=logging)
         if plan: return [node, plan, resources]
     # plan not found
     return [None, None, resources]
