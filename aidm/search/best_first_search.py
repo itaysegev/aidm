@@ -59,12 +59,11 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
                     # update value in closed list
                     closed_list.add_or_update(key=cur_node.state['key'],value=cur_value)
 
-            # if anytime is true - keep the best node so far
-            if is_anytime:
-                if best_node is None or problem.is_better(cur_value, best_value):
-                    best_value = cur_value
-                    best_node  = cur_node
-                    best_plan  = best_node.get_transition_path_string()
+            # keep the best node so far
+            if best_node is None or problem.is_better(cur_value, best_value):
+                best_value = cur_value
+                best_node  = cur_node
+                best_plan  = best_node.get_transition_path_string()
 
             # check if termination criteria had been met - and stop the search if it has
             if termination_criteria:
@@ -90,10 +89,15 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
             # add successors to the frontier
             for child in successors:
                 frontier.add(child,problem)
+        if is_anytime:
+            # search graph fully explored without finding a solution
+            if logging: logger.info('best_first_search: returning best solution')
+            return [best_node, best_plan, resources]
 
-        # search graph fully explored without finding a solution
-        if logging: logger.info('best_first_search: search graph fully explored without finding a solution')
-        return [None, None, resources]
+        else:
+            # search graph fully explored without finding a solution
+            if logging: logger.info('best_first_search: search graph fully explored without finding a solution')
+            return [None, None, resources]
 
     except Exception as e:
         if logging: logger.info('best_first_search: exception occurred: %s'%str(e))
