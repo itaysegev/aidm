@@ -51,6 +51,10 @@ class Problem (ABC):
     def is_better(self, value_a, value_b)->bool:
         pass
 
+    @abstractmethod
+    def evaluate(self,path):
+        pass
+
     def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
         if action:
             out = self._get_successors(state, action)
@@ -67,13 +71,6 @@ class Problem (ABC):
 
         # for more complex situations, we can use np.close(sum(probs), 1)
 
-
-    def evaluate(self,path:list[State,Action,State]):
-        value = 0
-        for state,action,next_state in path:
-            if action:
-                value += self.get_value(state,action,next_state)
-        return value
 
 
 

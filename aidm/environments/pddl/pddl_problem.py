@@ -15,6 +15,13 @@ class PDDLProblem(Problem):
     def get_current_state(self)->State:
         return State(key=self.get_state_key(self.current_state), content=self.current_state) #TODO decide about the state
 
+    def evaluate(self,path:list[State,Action,State], discount_factor=1):
+        value = 0
+        for state,action,next_state in path:
+            if action:
+                value += discount_factor*self.get_value(state,action,next_state)
+        return value
+
     def get_state_key(self, state:State):
         return str(state[0])
 
@@ -29,6 +36,7 @@ class PDDLProblem(Problem):
         grounded_actions = self.env.action_space.all_ground_literals(state['content'])
         for action in grounded_actions:
             actions.append(Action(key=self.get_action_key(action),content=action))
+        return actions
 
     def _get_successors(self, state, action)  -> list[tuple[State, float]]:
         successors = []

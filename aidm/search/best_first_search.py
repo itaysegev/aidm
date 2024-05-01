@@ -22,7 +22,7 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     """
 
     # init the search node
-    root_node = Node(state=problem.get_current_state(),action=None, parent=None)
+    root_node = Node(state=problem.get_current_state(),action=None, parent=None, value=0)
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
     frontier.add(root_node, problem)
@@ -30,14 +30,15 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     resources=ComputationalResources(iteration_bound=iter_limit, time_bound=time_limit, depth_bound=depth_bound)
     #initiliaze closed list if relevant
     closed_list = ClosedList() if use_closed_list else None
-
+    # keeping track of the best solution so far
+    best_node = None
     try:
 
         while not frontier.is_empty():
 
             # get the current node and its value
             cur_node = frontier.extract()
-            cur_value = problem.evaluate(path=cur_node.get_transition_path())
+            cur_value = cur_node.value
             if logging:logger.info('best_first_search resources %s cur_node:%s cur_value:%f' % (resources.__str__(),cur_node.__str__(), cur_value))
 
 
@@ -78,7 +79,9 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
             successors = []
             for action, outcomes in all_successors:
                 for state,_ in outcomes:
-                    successors.append(Node(state, action, cur_node))
+                    cur_node = Node(state, action, cur_node)
+                    cur_node.value = problem.evaluate(cur_node.get_transition_path())
+                    successors.append(cur_node)
 
             # if pruning is applied - prune the set of successors
             if prune_func is not None:
