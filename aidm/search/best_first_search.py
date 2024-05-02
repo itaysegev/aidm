@@ -35,7 +35,6 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     try:
 
         while not frontier.is_empty():
-
             # get the current node and its value
             cur_node = frontier.extract()
             cur_value = cur_node.value
@@ -54,8 +53,6 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
 
             # if the closed list was specified - check if this state should be explored again
             if closed_list:
-                print('Closed list:\n')
-                closed_list.print()
                 # if the state is already in the closed list and a better value was found
                 # extract it from the closed list
                 if not closed_list.get(cur_node.state['key']) or problem.is_better(cur_value, closed_list.get(cur_node.state['key'])):

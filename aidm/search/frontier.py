@@ -51,6 +51,9 @@ class Queue(Container):
     def __len__(self):
         return self.queue.qsize()
 
+    def print(self):
+        pass
+
 
 class FIFOQueue(Queue):
 
@@ -73,7 +76,7 @@ class PriorityQueue(Queue):
 
     def add(self, item, problem, check_existance=True):
         priority = self.eval_func(item,problem)
-        heapq.heappush(self.queue, (-priority, self._index, item))
+        heapq.heappush(self.queue, (priority, self._index, item))
         self._index += 1
 
     def extract(self):
@@ -81,3 +84,7 @@ class PriorityQueue(Queue):
 
     def __len__(self):
         return len(self.queue)
+
+    def print(self):
+        for element in self.queue:
+            print(element)

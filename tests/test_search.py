@@ -25,7 +25,7 @@ def test_pddl_search():
     print_results(info='a_star', node=best_node, plan=best_plan, resources=resources)
 
 
-    '''
+
     [best_node, best_plan, resources] = best_first_search(problem=problem,
                                                           frontier=PriorityQueue(eval_func=zero_heuristic),
                                                           termination_criteria=[CriteriaGoalState()],
@@ -41,7 +41,8 @@ def test_pddl_search():
     [best_node, best_plan, resources] = depth_first_search_l(problem=problem, depth_bound=2, use_closed_list=True, logging=False)
 
     print_results(info='depth_first_search_l', node=best_node, plan=best_plan, resources=resources)
-    '''
+
+
 
     #    env = problem.get_env()
     #    env.apply_plan(plan=best_plan,render=True)
