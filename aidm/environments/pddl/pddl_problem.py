@@ -16,8 +16,9 @@ class PDDLProblem(Problem):
         return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
 
     def state_to_key(self, state):
+        literals = sorted(state.literals)
         key = ''
-        for lit in state.literals:
+        for lit in literals:
             key+=str(lit)
         return key
 
