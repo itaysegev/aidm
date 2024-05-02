@@ -144,6 +144,12 @@ def greedy_best_first_search(problem, heuristic_func, use_closed_list=False, ite
 
 
 
+def uniform_cost_search(problem, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
+    #f_func is equal to g
+    f_func = lambda x,y: problem.evaluate(path=x.get_transition_path())
+    return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(f_func),
+                             termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list, iter_limit=iter_limit,
+                             time_limit=time_limit, depth_bound=None, logging=logging)
 
 
 

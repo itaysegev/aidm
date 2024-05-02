@@ -2,7 +2,7 @@
 from aidm.search.frontier import PriorityQueue, FIFOQueue
 from aidm.environments.pddl.pddl_problem import PDDLProblem
 from aidm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, \
-    depth_first_search_l, a_star
+    depth_first_search_l, a_star, uniform_cost_search
 from aidm.core.utils import CriteriaGoalState, print_results
 
 import gymnasium as gym
@@ -42,6 +42,9 @@ def test_pddl_search():
 
     print_results(info='depth_first_search_l', node=best_node, plan=best_plan, resources=resources)
 
+    [best_node, best_plan, resources] = uniform_cost_search(problem=problem, use_closed_list=True, logging=False)
+
+    print_results(info='uniform_cost_search', node=best_node, plan=best_plan, resources=resources)
 
 
     #    env = problem.get_env()
