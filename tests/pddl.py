@@ -50,7 +50,7 @@ DOMAIN = """
 
 """
 
-PROBLEM = """
+PROBLEM2 = """
 (define (problem 3t5b)
 (:domain n-table-blocks-world)
 (:objects 
@@ -84,6 +84,61 @@ T1 T2 T3  - table
 )
 (:goal (and
 (ontable B1 T3)
+(ontable B2 T2)
+))
+)
+"""
+
+PROBLEM2 = """
+(define (problem 3t5b)
+(:domain n-table-blocks-world)
+(:objects 
+B1 B2 - block
+Y B - color
+T1 - table
+)
+(:init
+(handempty)
+
+(ontable B1 T1)
+(clear B1)
+(bcolor B1 Y)
+
+(ontable B2 T1)
+(clear B2)
+(bcolor B2 B)
+
+)
+(:goal (and
+(holding B2)
+))
+)
+"""
+
+
+
+
+PROBLEM = """
+(define (problem 3t5b)
+(:domain n-table-blocks-world)
+(:objects 
+B1 B2 - block
+Y B - color
+T1 T2 - table
+)
+(:init
+(handempty)
+
+(ontable B1 T1)
+(clear B1)
+(bcolor B1 Y)
+
+(ontable B2 T1)
+(clear B2)
+(bcolor B2 B)
+
+)
+(:goal (and
 (ontable B2 T2)
 ))
 )

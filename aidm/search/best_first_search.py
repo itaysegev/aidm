@@ -6,7 +6,7 @@ from ..core.utils import logger, ClosedList, CriteriaGoalState
 from .node import Node
 
 def best_first_search(problem, frontier, termination_criteria=None, prune_func=None, use_closed_list=False,
-                      is_anytime=False, iter_limit=None, time_limit=None, logging=False, depth_bound=None):
+                      is_anytime=False, iter_limit=None, time_limit=None, logging=False, depth_bound=None, sort_successors=True):
     """Search for an action sequence with maximal value.
        The search problem must specify the following elements:
 
@@ -54,11 +54,16 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
 
             # if the closed list was specified - check if this state should be explored again
             if closed_list:
+                print('Closed list:\n')
+                closed_list.print()
                 # if the state is already in the closed list and a better value was found
                 # extract it from the closed list
                 if not closed_list.get(cur_node.state['key']) or problem.is_better(cur_value, closed_list.get(cur_node.state['key'])):
                     # update value in closed list
                     closed_list.add_or_update(key=cur_node.state['key'],value=cur_value)
+                else:
+                    continue
+
 
             # keep the best node so far
             if best_node is None or problem.is_better(cur_value, best_value):
@@ -79,15 +84,16 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
             successors = []
             for action, outcomes in all_successors:
                 for state,_ in outcomes:
-                    cur_node = Node(state, action, cur_node)
-                    cur_node.value = problem.evaluate(cur_node.get_transition_path())
-                    successors.append(cur_node)
+                    new_node = Node(state, action, cur_node)
+                    new_node.value = problem.evaluate(new_node.get_transition_path())
+                    successors.append(new_node)
 
             # if pruning is applied - prune the set of successors
             if prune_func is not None:
                 successors = prune_func(successors, cur_node)
-            # sort successors to make sure goal is reached at the same time for all approaches
-            successors = sorted(successors, key=lambda x: x.get_transition_path_string(), reverse=False)
+            if sort_successors:
+                # sort successors to make sure goal is reached at the same time for all approaches
+                successors = sorted(successors, key=lambda x: x.get_transition_path_string(), reverse=False)
 
             # add successors to the frontier
             for child in successors:
@@ -128,7 +134,7 @@ def depth_first_search_l(problem, depth_bound:int, use_closed_list=False, iter_l
 
 def a_star(problem, heuristic_func, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
     #f_func is equal to g+h
-    f_func = lambda x: problem.evaluate(path=x.get_transition_path())+heuristic_func(x)
+    f_func = lambda x,y: problem.evaluate(path=x.get_transition_path())+heuristic_func(x,y)
     return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(f_func),
                              termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list, iter_limit=iter_limit,
                              time_limit=time_limit, depth_bound=None, logging=logging)
@@ -138,8 +144,6 @@ def greedy_best_first_search(problem, heuristic_func, use_closed_list=False, ite
     return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(heuristic_func),
                              termination_criteria=[CriteriaGoalState()], prune_func=None,use_closed_list=use_closed_list, iter_limit=iter_limit,
                              time_limit=time_limit, depth_bound=None, logging=logging)
-
-
 
 
 

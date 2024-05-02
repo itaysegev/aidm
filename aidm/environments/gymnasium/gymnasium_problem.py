@@ -24,12 +24,6 @@ class GymnasiumProblem(Problem):
     def get_current_state(self) -> State:
         return State(key=self.get_state_key(self.current_state),content=self.current_state)
 
-    def get_state_key(self, state: State):
-        return str(state[0])
-
-    def get_action_key(self, action: Action):
-        return action
-
     def is_better(self, value_a, value_b) -> bool:
         return True if value_a > value_b else False
 

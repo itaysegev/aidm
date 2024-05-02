@@ -2,7 +2,7 @@
 from aidm.search.frontier import PriorityQueue, FIFOQueue
 from aidm.environments.pddl.pddl_problem import PDDLProblem
 from aidm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, \
-    depth_first_search_l
+    depth_first_search_l, a_star
 from aidm.core.utils import CriteriaGoalState, print_results
 
 import gymnasium as gym
@@ -14,14 +14,18 @@ def test_pddl_search():
 
     # create a wrapper of the environment to the search
     problem = PDDLProblem(domain_file=DOMAIN, problem_file=PROBLEM)
-    # perform best_first_serch
-    [best_node, best_plan, resources] = breadth_first_search(problem=problem,
-                                                          iter_limit=1000,
-                                                          logging=False)
+
+    # perform bfs
+    [best_node, best_plan, resources] = breadth_first_search(problem=problem, iter_limit=1000, logging=False)
 
     print_results(info='breadth_first_search', node=best_node, plan=best_plan, resources=resources)
 
+    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
 
+    print_results(info='a_star', node=best_node, plan=best_plan, resources=resources)
+
+
+    '''
     [best_node, best_plan, resources] = best_first_search(problem=problem,
                                                           frontier=PriorityQueue(eval_func=zero_heuristic),
                                                           termination_criteria=[CriteriaGoalState()],
@@ -34,9 +38,10 @@ def test_pddl_search():
 
     print_results(info='depth_first_search', node=best_node, plan=best_plan, resources=resources)
 
-    [best_node, best_plan, resources] = depth_first_search_l(problem=problem, depth_bound=10, use_closed_list=True, logging=False)
+    [best_node, best_plan, resources] = depth_first_search_l(problem=problem, depth_bound=2, use_closed_list=True, logging=False)
 
     print_results(info='depth_first_search_l', node=best_node, plan=best_plan, resources=resources)
+    '''
 
     #    env = problem.get_env()
     #    env.apply_plan(plan=best_plan,render=True)

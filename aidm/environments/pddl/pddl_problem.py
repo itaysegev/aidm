@@ -13,7 +13,13 @@ class PDDLProblem(Problem):
         super().__init__()
 
     def get_current_state(self)->State:
-        return State(key=self.get_state_key(self.current_state), content=self.current_state) #TODO decide about the state
+        return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
+
+    def state_to_key(self, state):
+        key = ''
+        for lit in state.literals:
+            key+=str(lit)
+        return key
 
     def evaluate(self,path:list[State,Action,State], discount_factor=1):
         value = 0
@@ -22,25 +28,19 @@ class PDDLProblem(Problem):
                 value += discount_factor*self.get_value(state,action,next_state)
         return value
 
-    def get_state_key(self, state:State):
-        return str(state[0])
-
-    def get_action_key(self, action: Action):
-        return action
-
     def is_better(self, value_a, value_b)->bool:
-        return True if value_a > value_b else False
+        return True if value_a < value_b else False
 
     def get_applicable_actions(self, state:State)-> list[Action]:
         actions = []
         grounded_actions = self.env.action_space.all_ground_literals(state['content'])
         for action in grounded_actions:
-            actions.append(Action(key=self.get_action_key(action),content=action))
+            actions.append(Action(key=action,content=action))
         return actions
 
-    def _get_successors(self, state, action)  -> list[tuple[State, float]]:
+    def _get_successors(self, pre_state, action)  -> list[tuple[State, float]]:
         successors = []
-        raw_transitions = self.env._get_successor_states(state['content'], action['content'], self.env.domain,
+        raw_transitions = self.env._get_successor_states(pre_state['content'], action['content'], self.env.domain,
                                             inference_mode=self.env._inference_mode,
                                             raise_error_on_invalid_action=self.env._raise_error_on_invalid_action,
                                                          return_probs=True)
@@ -56,8 +56,7 @@ class PDDLProblem(Problem):
             info = {}
             info['prob'] = prob
             info['reward'] = reward
-            #TODO: what is the key here?
-            next_state=State(key=self.get_state_key(next_state),content=next_state)
+            next_state=State(key=self.state_to_key(next_state),content=next_state)
             successors.append([next_state, prob])
 
         return successors

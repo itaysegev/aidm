@@ -39,6 +39,9 @@ class ClosedList():
     def get(self, key:Any):
         return self.dict.get(key)
 
+    def print(self):
+        for key, value in self.dict.items():
+            print('key', key, ':', 'value', value)
 class Criteria(ABC):
 
     @abstractmethod

@@ -40,19 +40,14 @@ class Problem (ABC):
         pass
 
     @abstractmethod
-    def get_state_key(self, state:State):
-        pass
-
-    @abstractmethod
-    def get_action_key(self, action: Action):
-        pass
-
-    @abstractmethod
     def is_better(self, value_a, value_b)->bool:
         pass
 
     @abstractmethod
     def evaluate(self,path):
+        pass
+
+    def state_to_key(self, state):
         pass
 
     def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
