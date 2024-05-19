@@ -32,6 +32,8 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     closed_list = ClosedList() if use_closed_list else None
     # keeping track of the best solution so far
     best_node = None
+    best_value = None
+                        
     try:
 
         while not frontier.is_empty():
