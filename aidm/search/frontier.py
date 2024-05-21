@@ -1,5 +1,6 @@
 import queue, heapq
 from abc import ABC, abstractmethod
+import numpy as np
 
 class Container(ABC):
 
@@ -69,13 +70,18 @@ class LIFOQueue(Queue):
 
 class PriorityQueue(Queue):
 
-    def __init__(self, eval_func=lambda x: x, max_len=None):
+    def __init__(self, eval_func=lambda x: x, max_len=None, check_before_insert=True):
         super().__init__(queue=[],max_len=max_len)
         self.eval_func = eval_func
         self._index = 0
+        self.check_before_insert = check_before_insert
 
     def add(self, item, problem, check_existance=True):
         priority = self.eval_func(item,problem)
+        if self.check_before_insert:
+            if priority<=-np.inf or priority>np.inf or priority is None:
+                print('value of nodes exceeds value bounds')
+                return
         heapq.heappush(self.queue, (priority, self._index, item))
         self._index += 1
 
