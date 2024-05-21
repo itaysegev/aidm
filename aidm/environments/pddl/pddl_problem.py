@@ -89,3 +89,6 @@ class PDDLProblem(Problem):
 
     def get_env(self):
         return self.env
+
+    def get_goal(self):
+        return self.env._goal
