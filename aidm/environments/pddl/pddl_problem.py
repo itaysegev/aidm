@@ -6,12 +6,22 @@ from ...core.utils import State, Action
 
 
 class PDDLProblem(Problem):
-
-    def __init__(self, domain, problem, operators_as_actions=True, dynamic_action_space=True):
+    def __init__(self, domain, problem, operators_as_actions=True, dynamic_action_space=True, relaxed=False):
         self.env = PDDLEnv(domain, problem, operators_as_actions=operators_as_actions,
-                           dynamic_action_space=dynamic_action_space)
+                           dynamic_action_space=dynamic_action_space, relaxed=relaxed)
+        self.__dynamic_action_space = dynamic_action_space  # saving this for the copy constructor
+
         self.current_state, _ = self.env.reset()
         super().__init__()
+
+    def relaxed(self):
+        return PDDLProblem(
+            domain=self.env.domain.domain_fname,
+            problem=self.env._problem.problem_fname,
+            operators_as_actions=self.env.operators_as_actions,
+            dynamic_action_space=self.__dynamic_action_space,
+            relaxed=True
+        )
 
     def get_current_state(self)->State:
         return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
