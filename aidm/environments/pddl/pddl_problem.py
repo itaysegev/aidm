@@ -1,4 +1,5 @@
 from pddlgymnasium.core import PDDLEnv
+from pddlgymnasium.downward_translate.pddl_parser import open as downward_open
 
 from ...core.problem import Problem
 from ...core.utils import State, Action
@@ -64,6 +65,14 @@ class PDDLProblem(Problem):
         return successors
 
     def get_cost(self, state: State, action: Action = None, next_state: State = None):
+        task = downward_open(self.env.domain.domain_fname, self.env._problem.problem_fname)
+        for downward_action in task.actions:
+            if downward_action.name == action['content'].predicate.name:
+                cost = downward_action.cost
+                if cost is None:
+                    break
+                return cost
+
         return 1
 
     def get_value(self, state: State, action=None, next_state=None):
