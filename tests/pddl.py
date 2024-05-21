@@ -83,13 +83,13 @@ T1 T2 T3  - table
 
 )
 (:goal (and
-(ontable B1 T3)
+(ontable B4 T1)
 (ontable B2 T2)
 ))
 )
 """
 
-PROBLEM2 = """
+PROBLEM3 = """
 (define (problem 3t5b)
 (:domain n-table-blocks-world)
 (:objects 

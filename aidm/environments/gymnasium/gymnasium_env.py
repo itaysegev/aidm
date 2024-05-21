@@ -7,7 +7,7 @@ class GymasiumEnv(Env):
     def __int__(self):
         super().__init__()
 
-    def __gym_state_to_aidm_state(self, state: ) -> State:
+    def __gym_state_to_aidm_state(self, state) -> State:
         return State(
             key=str(state),
             content=state

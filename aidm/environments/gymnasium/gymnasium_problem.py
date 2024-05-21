@@ -14,18 +14,14 @@ class GymnasiumProblem(Problem):
 
     def __init__(self, domain_name, init_state=None, operators_as_actions=True, dynamic_action_space=True):
         super().__init__()
-        self.env = GymasiumEnv(domain_name, operators_as_actions=operators_as_actions,
-                               dynamic_action_space=dynamic_action_space)
+        #self.env = GymasiumEnv(domain_name, operators_as_actions=operators_as_actions, dynamic_action_space=dynamic_action_space)
         if init_state:
             self.current_state = self.env.set_state(init_state)
         else:
             self.current_state = self.env.reset()
 
     def get_current_state(self) -> State:
-        return State(key=self.get_state_key(self.current_state),content=self.current_state)
-
-    def is_better(self, value_a, value_b) -> bool:
-        return True if value_a > value_b else False
+        return State(key=self.state_to_key(self.current_state),content=self.current_state)
 
     def get_applicable_actions(self, state: State) -> list[Action]:
         actions = []
@@ -43,11 +39,6 @@ class GymnasiumProblem(Problem):
 
         return successors
 
-    def get_cost(self, state: State, action: Action = None, next_state: State = None):
-        return 1
-
-    def get_value(self, state: State, action=None, next_state=None):
-        return self.get_cost(state=state, action=action, next_state=next_state)
 
     def is_goal_state(self, state: State):
         return self.env._is_goal_reached(state['content'])
@@ -60,3 +51,5 @@ class GymnasiumProblem(Problem):
 
     def get_env(self):
         return self.env
+
+

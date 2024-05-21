@@ -47,8 +47,10 @@ class Problem (ABC):
     def evaluate(self,path):
         pass
 
+    @abstractmethod
     def state_to_key(self, state):
         pass
+
 
     def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
         if action:

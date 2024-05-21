@@ -1,22 +1,20 @@
-import numpy as np
-import gym
+from collections import defaultdict
 import random
+
+# based on
 #https://www.gocoder.one/blog/rl-tutorial-with-openai-gym
+#https://github.com/chenmagi/q-cartpole-td0
 
-def q_learning(problem, learning_rate = 0.9, discount_rate = 0.8, epsilon = 1.0, decay_rate= 0.005, num_episodes = 1000, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
+def q_learning(problem, default_value=lambda: 0.0, learning_rate = 0.9, discount_rate = 0.8, epsilon = 1.0, decay_rate= 0.005, num_episodes = 1000, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
+    q_table = defaultdict(default_value)
 
-    q_table = train(problem, learning_rate, discount_rate, epsilon, decay_rate, num_episodes, max_steps_per_episode, log, log_file)
+    q_table = train(problem, q_table, learning_rate, discount_rate, epsilon, decay_rate, num_episodes, max_steps_per_episode, log, log_file)
     return q_table
 
 def evaluate_q_table(problem, q_table, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
     evaluate(problem, q_table, max_steps_per_episode, num_of_trials)
 
-def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000, max_steps_per_episode=99, log=False, log_file=None):
-
-    # initialize q-table
-    state_size = problem.env.observation_space.n
-    action_size = problem.env.action_space.n
-    qtable = np.zeros((state_size, action_size))
+def train(problem, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000, max_steps_per_episode=99, log=False, log_file=None):
 
     # training
     for episode in range(num_episodes):
@@ -28,7 +26,7 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
             # exploration-exploitation tradeoff
             if random.uniform(0,1) < epsilon:
                 # explore
-                action = problem.env.action_space.sample()
+                action = problem.env.action_space.sample(state)
             else:
                 # exploit
                 action = np.argmax(qtable[state,:])

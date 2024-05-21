@@ -30,15 +30,15 @@ class ComputationalResources:
     # return whether there are any remaining resources
     def are_exhausted(self, node=Node):
 
-        if self.iteration_bound:
+        if self.iteration_bound is not None:
             if self.iteration_count > self.iteration_bound:
                 return True
 
-        if self.time_bound:
+        if self.time_bound is not None:
             if self.current_time - self.init_time > self.time_bound:
                 return True
 
-        if self.depth_bound:
+        if self.depth_bound is not None:
             if len(node.get_transition_path())>self.depth_bound:
                 return True
 
