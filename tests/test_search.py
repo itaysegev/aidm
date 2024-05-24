@@ -15,6 +15,7 @@ import gymnasium as gym
 
 from aidm.search.heuristic import goal_heuristic, zero_heuristic
 from pddl import DOMAIN, PROBLEM, PROBLEM2
+import numpy as np
 
 from pddlgymnasium.parser import Operator
 class RelaxedPDDLProblem(PDDLProblem):
@@ -32,19 +33,28 @@ class RelaxedPDDLProblem(PDDLProblem):
             parsed_operators[operator] = Operator(name=operator, params=self.env.domain.operators[operator].params, preconds=self.env.domain.operators[operator].preconds, effects=parsed_effects)
         self.env.domain.operators = parsed_operators
 
+# todo: avoid recreating the problem at every iteration
 def my_heuristic(node, problem):
-    relaxed_problem = RelaxedPDDLProblem(domain=problem.env.domain.domain_fname,problem=problem.env.problems[0].problem_fname)
-    #PARSED_DOMAIN = problem.env.domain.domain_fname.replace('not','')
-    #relaxed_problem = PDDLProblem(domain=PARSED_DOMAIN,problem=problem.env.problems[0].problem_fname)
-
-    [best_node, best_plan, resources] = breadth_first_search(problem=relaxed_problem, iter_limit=1000,
-                                                             logging=False)
+    relaxed_problem = problem.get_relaxed_problem()
+    relaxed_problem.set_current_state(node.state)
+    [best_node, best_plan, resources] = breadth_first_search(relaxed_problem, logging=False)
     if best_plan is None:
-        return 0
-
+        print('my heuristic for node %s is %f'%(node, np.inf))
+        return np.inf
+    print('my heuristic for node %s is %f'%(node, len(best_plan)))
     return len(best_plan)
 
-
+def my_heuristic2(node, problem):
+    #get current state literals
+    current_state_literals = node.state['content'].literals
+    #get goal literals
+    goal_state_literals = problem.env.problems[0].goal.literals
+    #check difference
+    count = len(goal_state_literals)
+    for literal in goal_state_literals:
+        if literal in  current_state_literals:
+            count -=1
+    return count
 def test_pddl_search():
 
     # create a wrapper of the environment to the search
@@ -54,10 +64,9 @@ def test_pddl_search():
     #[best_node, best_plan, resources] = breadth_first_search(problem=problem, iter_limit=1000, logging=False)
 
     #print_results(info='breadth_first_search', node=best_node, plan=best_plan, resources=resources)
+    #[best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
 
-    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
-
-    print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
+    #print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
 
 
 
@@ -81,8 +90,7 @@ def test_pddl_search():
 
     #print_results(info='uniform_cost_search', node=best_node, plan=best_plan, resources=resources)
 
-
-    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic, logging=False, use_closed_list=True)
+    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic2, logging=False, use_closed_list=True)
 
     print_results(info='a_star with my heuristic', node=best_node, plan=best_plan, resources=resources)
 
@@ -115,7 +123,36 @@ def test_gym_search():
 
     problem.apply_plan(plan=best_plan,render=True)
 
+def test_relaxed():
+    problem = PDDLProblem(domain='domain.pddl', problem='problem0.2.pddl', relaxed=False)
+    #problem = PDDLProblem(domain=DOMAIN, problem=PROBLEM2, relaxed=False)
+
+    #best_node, best_plan, resources = breadth_first_search(
+    #    problem=problem,
+    #    use_closed_list=True,
+    #)
+    #print_results(info='bfs', node=best_node, plan=best_plan, resources=resources)
+
+    #relaxed_problem = problem.relaxed()
+
+    #r_best_node, r_best_plan, r_resources = breadth_first_search(
+    #    problem=relaxed_problem,
+    #    use_closed_list=True,
+    #)
+    #print_results(info='bfs relaxed', node=r_best_node, plan=r_best_plan, resources=r_resources)
+
+    #[best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
+
+    #print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
+
+
+    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic2, logging=False, use_closed_list=True)
+
+    print_results(info='a_star with my heuristic2', node=best_node, plan=best_plan, resources=resources)
+
+
 
 if __name__ == "__main__":
-    test_pddl_search()
+    #test_pddl_search()
     #test_gym_search()
+    test_relaxed()

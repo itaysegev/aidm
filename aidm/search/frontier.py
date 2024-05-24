@@ -1,5 +1,6 @@
 import queue, heapq
 from abc import ABC, abstractmethod
+from ..core.defs import NEG_INFNTY, INFNTY
 import numpy as np
 
 class Container(ABC):
@@ -79,7 +80,7 @@ class PriorityQueue(Queue):
     def add(self, item, problem, check_existance=True):
         priority = self.eval_func(item,problem)
         if self.check_before_insert:
-            if priority<=-np.inf or priority>np.inf or priority is None:
+            if priority<=-np.inf or priority>=np.inf or priority is None:
                 print('value of nodes exceeds value bounds')
                 return
         heapq.heappush(self.queue, (priority, self._index, item))

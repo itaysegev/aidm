@@ -12,6 +12,9 @@ class PDDLProblem(Problem):
         self.__dynamic_action_space = dynamic_action_space  # saving this for the copy constructor
 
         self.current_state, _ = self.env.reset()
+
+        self.relaxed_version = None
+
         super().__init__()
 
     def relaxed(self):
@@ -23,9 +26,20 @@ class PDDLProblem(Problem):
             relaxed=True
         )
 
+    def get_relaxed_problem(self):
+        if self.relaxed_version is None:
+            self.relaxed_version = self.relaxed()
+        return self.relaxed_version
+
     def get_current_state(self)->State:
         return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
 
+    def set_current_state(self, state:State):
+        self.env.problems[0]
+        COMPLETE
+        self.env.set_state(state)
+
+        self.current_state = state
 
     def state_to_key(self, state):
         literals = sorted(state.literals)
@@ -102,3 +116,4 @@ class PDDLProblem(Problem):
 
     def get_goal(self):
         return self.env._goal
+
