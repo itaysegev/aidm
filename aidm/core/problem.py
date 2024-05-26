@@ -78,7 +78,5 @@ class Problem (ABC):
         # for more complex situations, we can use np.close(sum(probs), 1)
 
 
-class ProblemSimulator:
-    pass
 
 

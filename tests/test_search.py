@@ -1,20 +1,17 @@
 #from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
-import copy
 
 from pddlgymnasium.structs import LiteralConjunction
 
-from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
-from aidm.environments.gymnasium.taxi_problem import TaxiProblem
-from aidm.search.frontier import PriorityQueue, FIFOQueue
+from aidm.todos.gymnasium import TaxiProblem
+from aidm.search.frontier import PriorityQueue
 from aidm.environments.pddl.pddl_problem import PDDLProblem
 from aidm.search.best_first_search import best_first_search, breadth_first_search, depth_first_search, \
     depth_first_search_l, a_star, uniform_cost_search
-from aidm.core.utils import CriteriaGoalState, print_results, State, Action
+from aidm.core.utils import CriteriaGoalState, print_results
 
 import gymnasium as gym
 
 from aidm.search.heuristic import goal_heuristic, zero_heuristic
-from pddl import DOMAIN, PROBLEM, PROBLEM2
 import numpy as np
 
 from pddlgymnasium.parser import Operator
@@ -53,6 +50,7 @@ def my_heuristic2(node, problem):
         if literal in  current_state_literals:
             count -=1
     return count
+
 def test_pddl_search(problem_name):
 
     # create a wrapper of the environment to the search

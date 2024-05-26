@@ -3,8 +3,8 @@ __author__ = 'sarah'
 from abc import ABC
 
 from .gymnasium_env import GymasiumEnv
-from ...core.problem import Problem
-from ...core.utils import Action, State
+from aidm.core.problem import Problem
+from aidm.core.utils import Action, State
 import gymnasium as gym
 
 

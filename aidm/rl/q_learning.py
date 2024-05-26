@@ -8,40 +8,35 @@ import numpy as np
 
 def q_learning(problem, default_value=lambda: defaultdict(float), learning_rate = 0.9, discount_rate = 0.8, epsilon = 1.0, decay_rate= 0.005, num_episodes = 1000, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
     q_table = defaultdict(default_value)
-
-    q_table = train(problem, q_table, learning_rate, discount_rate, epsilon, decay_rate, num_episodes, max_steps_per_episode, log, log_file)
+    q_table = train(problem.env, q_table, learning_rate, discount_rate, epsilon, decay_rate, num_episodes, max_steps_per_episode, log, log_file)
     return q_table
 
-def evaluate_q_table(problem, q_table, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
-    evaluate(problem, q_table, max_steps_per_episode, num_of_trials)
+def evaluate_q_table(env, q_table, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
+    evaluate(env, q_table, max_steps_per_episode, num_of_trials)
 
-def train(problem, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000, max_steps_per_episode=99, log=False, log_file=None):
-    state_map = {}
-    action_map = {}
+def train(env, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000, max_steps_per_episode=99, log=False, log_file=None):
 
     # training
     for episode in range(num_episodes):
 
         # reset the environment
-        state = problem.reset_env()
+        state = env.reset()[0]
         for step in range(max_steps_per_episode):
 
             # exploration-exploitation tradeoff
             if random.uniform(0,1) < epsilon:
                 # explore
-                action = problem.sample_action(state)
+                action = env.action_space.sample(state)
             else:
                 # exploit
-                action_key = max(q_table[state['key']],key=lambda action:q_table[state['key']][action])
-                action = action_map[action_key]
+                action = max(q_table[state],key=lambda action:q_table[state][action])
 
             # take action and observe reward
-            [new_state, reward, terminated, truncated, info] = problem.apply_action(action) #problem.env.step(action)
+            [new_state, reward, terminated, truncated, info] = env.step(action)
 
             # Q-learning update
-            q_table[state['key']][action['key']] += learning_rate * (reward + discount_rate * max(q_table[new_state['key']].values()) - q_table[state['key']][action['key']])
-            state_map[state['key']] = state
-            action_map[action['key']] = action
+            #q_table[state['key']][action['key']] += learning_rate * (reward + discount_rate * max(q_table[new_state['key']].values()) - q_table[state['key']][action['key']])
+            q_table[state][action] += learning_rate * (reward + discount_rate * max(q_table[new_state].values()) - q_table[state][action])
 
             # Update to our new state
             state = new_state

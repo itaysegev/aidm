@@ -1,6 +1,6 @@
 import gymnasium as gym
-from ...core.env import Env
-from ...core.utils import Action, State
+from aidm.core.env import Env
+from aidm.core.utils import Action, State
 
 
 class GymasiumEnv(Env):

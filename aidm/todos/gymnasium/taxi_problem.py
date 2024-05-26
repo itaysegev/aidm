@@ -1,5 +1,5 @@
 from aidm.core.utils import State, Action
-from aidm.environments.gymnasium.gymnasium_problem import GymnasiumProblem
+from aidm.todos.gymnasium.gymnasium_problem import GymnasiumProblem
 
 
 class TaxiProblem(GymnasiumProblem):
