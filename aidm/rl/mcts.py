@@ -30,7 +30,7 @@ class MCTSNode(utils.Node):
 def mcts(problem, comp_resources, selection_policy, expansion_policy, rollout_policy):
 
     # initialize the search tree
-    root_node = MCTSNode(problem.get_current_state(), problem.get_applicable_actions_at_state(problem.get_current_state()),  None, None, 0, None, None)
+    root_node = MCTSNode(problem.get_initial_state(), problem.get_applicable_actions_at_state(problem.get_initial_state()), None, None, 0, None, None)
 
     # perform the search
     while not are_resources_exhausted(comp_resources):

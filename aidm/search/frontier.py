@@ -1,6 +1,5 @@
 import queue, heapq
 from abc import ABC, abstractmethod
-from ..core.defs import NEG_INFNTY, INFNTY
 import numpy as np
 
 class Container(ABC):

@@ -20,7 +20,7 @@ class GymnasiumProblem(Problem):
         else:
             self.current_state = self.env.reset()
 
-    def get_current_state(self) -> State:
+    def get_initial_state(self) -> State:
         return State(key=self.state_to_key(self.current_state),content=self.current_state)
 
     def get_applicable_actions(self, state: State) -> list[Action]:

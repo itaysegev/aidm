@@ -36,7 +36,11 @@ class Problem (ABC):
         pass
 
     @abstractmethod
-    def get_current_state(self)->State:
+    def get_initial_state(self)->State:
+        pass
+
+    @abstractmethod
+    def set_initial_state(self, state:State):
         pass
 
     @abstractmethod
@@ -56,9 +60,6 @@ class Problem (ABC):
     def sample_action(self,state:State)->Action:
         pass
 
-    @abstractmethod
-    def set_current_state(self, state:State):
-        pass
 
     def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
         if action:
@@ -77,5 +78,7 @@ class Problem (ABC):
         # for more complex situations, we can use np.close(sum(probs), 1)
 
 
+class ProblemSimulator:
+    pass
 
 

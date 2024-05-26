@@ -36,7 +36,7 @@ class RelaxedPDDLProblem(PDDLProblem):
 # todo: avoid recreating the problem at every iteration
 def my_heuristic(node, problem):
     relaxed_problem = problem.get_relaxed_problem()
-    relaxed_problem.set_current_state(node.state)
+    relaxed_problem.set_initial_state(node.state)
     [best_node, best_plan, resources] = breadth_first_search(relaxed_problem, logging=False)
     if best_plan is None:
         return np.inf

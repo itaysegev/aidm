@@ -22,7 +22,7 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
     """
 
     # init the search node
-    root_node = Node(state=problem.get_current_state(),action=None, parent=None, value=0)
+    root_node = Node(state=problem.get_initial_state(), action=None, parent=None, value=0)
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
     frontier.add(root_node, problem)

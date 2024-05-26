@@ -11,7 +11,7 @@ class PDDLProblem(Problem):
                            dynamic_action_space=dynamic_action_space, relaxed=relaxed)
         self.__dynamic_action_space = dynamic_action_space  # saving this for the copy constructor
 
-        self.current_state = None
+        self.initial_state = None
         self.reset_env()
 
         self.relaxed_version = None
@@ -32,11 +32,11 @@ class PDDLProblem(Problem):
             self.relaxed_version = self.relaxed()
         return self.relaxed_version
 
-    def get_current_state(self)->State:
-        return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
+    def get_initial_state(self)->State:
+        return State(key=self.state_to_key(self.initial_state), content=self.initial_state)
 
-    def set_current_state(self, state:State):
-        self.current_state = state['content']
+    def set_initial_state(self, state:State):
+        self.initial_state = state['content']
         self.env.set_state(state['content'])
 
     def sample_action(self, state: State) -> Action:
@@ -120,8 +120,8 @@ class PDDLProblem(Problem):
         return self.env.step(action['content'])
 
     def reset_env(self):
-        self.current_state, _ = self.env.reset()
-        return  State(key=self.state_to_key(self.current_state), content=self.current_state)
+        self.initial_state, _ = self.env.reset()
+        return  State(key=self.state_to_key(self.initial_state), content=self.initial_state)
 
     def get_env(self):
         return self.env
