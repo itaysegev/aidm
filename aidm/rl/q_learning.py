@@ -1,6 +1,7 @@
 from collections import defaultdict
 import random
-
+from ..core.utils import State, Action
+import numpy as np
 # based on
 #https://www.gocoder.one/blog/rl-tutorial-with-openai-gym
 #https://github.com/chenmagi/q-cartpole-td0
@@ -21,21 +22,22 @@ def train(problem, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, d
 
         # reset the environment
         state = problem.reset_env()
-        for s in range(max_steps_per_episode):
+        for step in range(max_steps_per_episode):
 
             # exploration-exploitation tradeoff
             if random.uniform(0,1) < epsilon:
                 # explore
-                action = problem.env.action_space.sample(state)
+                action = problem.sample_action(state)
             else:
                 # exploit
-                action = np.argmax(qtable[state,:])
+                action = np.argmax(q_table[state,:])
 
             # take action and observe reward
-            [new_state, reward, terminated, truncated, info] = problem.env.step(action)
+            [new_state, reward, terminated, truncated, info] = problem.apply_action(action) #problem.env.step(action)
 
             # Q-learning update
-            qtable[state,action] = qtable[state,action] + learning_rate * (reward + discount_rate * np.max(qtable[new_state,:]) - qtable[state,action])
+            key= [state['key'], action['key']]
+            q_table[key] = q_table[{state['key'],action['key']}] + learning_rate * (reward + discount_rate * np.max(q_table[new_state['key'],:]) - q_table[state['key'],action['key']])
 
             # Update to our new state
             state = new_state
@@ -48,7 +50,7 @@ def train(problem, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, d
         epsilon *= np.exp(-decay_rate)
 
     print(f"Training completed over {num_episodes} episodes")
-    return qtable
+    return q_table
 
 def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= False, log=False, log_file=None):
 

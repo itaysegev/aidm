@@ -48,9 +48,17 @@ class Problem (ABC):
         pass
 
     @abstractmethod
-    def state_to_key(self, state):
+    def state_to_key(self, state:State):
         pass
 
+
+    @abstractmethod
+    def sample_action(self,state:State)->Action:
+        pass
+
+    @abstractmethod
+    def set_current_state(self, state:State):
+        pass
 
     def get_successors(self, state: State, action: Action=None) -> list[Action,list[tuple[State, float]]]:
         if action:

@@ -11,7 +11,7 @@ from pddl import DOMAIN,PROBLEM
 def test_pddl_rl():
 
     # create a wrapper of the environment to the search
-    problem = PDDLProblem(domain_file=DOMAIN, problem_file=PROBLEM)
+    problem = PDDLProblem(domain='domain.pddl', problem='problem0.2.pddl')
 
     # perform q_learning
     [best_node, best_plan, resources] = q_learning(problem=problem)

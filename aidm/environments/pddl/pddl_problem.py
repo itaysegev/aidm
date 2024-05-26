@@ -11,7 +11,8 @@ class PDDLProblem(Problem):
                            dynamic_action_space=dynamic_action_space, relaxed=relaxed)
         self.__dynamic_action_space = dynamic_action_space  # saving this for the copy constructor
 
-        self.current_state, _ = self.env.reset()
+        self.current_state = None
+        self.reset_env()
 
         self.relaxed_version = None
 
@@ -35,11 +36,18 @@ class PDDLProblem(Problem):
         return State(key=self.state_to_key(self.current_state), content=self.current_state) #TODO decide about the state
 
     def set_current_state(self, state:State):
-        self.env.problems[0]
-        COMPLETE
-        self.env.set_state(state)
+        self.current_state = state['content']
+        self.env.set_state(state['content'])
 
-        self.current_state = state
+    def sample_action(self, state: State) -> Action:
+        # convert ai_dm state to pddl state
+        pddl_state = self.convert_state(state)
+        action = self.env.action_space.sample(pddl_state)
+        return Action(key=self.action_to_key(action),content=action)
+
+
+    def convert_state(self, state: State):
+        return state['content']
 
     def state_to_key(self, state):
         literals = sorted(state.literals)
@@ -47,6 +55,9 @@ class PDDLProblem(Problem):
         for lit in literals:
             key+=str(lit)
         return key
+
+    def action_to_key(self, action):
+        return action
 
     def evaluate(self,path:list[State,Action,State], discount_factor=1):
         value = 0
@@ -106,10 +117,11 @@ class PDDLProblem(Problem):
         return self.env._is_goal_reached(state['content'])
 
     def apply_action(self, action):
-        return self.env.step(action)
+        return self.env.step(action['content'])
 
     def reset_env(self):
-        return self.env.reset()
+        self.current_state, _ = self.env.reset()
+        return  State(key=self.state_to_key(self.current_state), content=self.current_state)
 
     def get_env(self):
         return self.env

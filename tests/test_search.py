@@ -39,9 +39,7 @@ def my_heuristic(node, problem):
     relaxed_problem.set_current_state(node.state)
     [best_node, best_plan, resources] = breadth_first_search(relaxed_problem, logging=False)
     if best_plan is None:
-        print('my heuristic for node %s is %f'%(node, np.inf))
         return np.inf
-    print('my heuristic for node %s is %f'%(node, len(best_plan)))
     return len(best_plan)
 
 def my_heuristic2(node, problem):
@@ -55,40 +53,41 @@ def my_heuristic2(node, problem):
         if literal in  current_state_literals:
             count -=1
     return count
-def test_pddl_search():
+def test_pddl_search(problem_name):
 
     # create a wrapper of the environment to the search
-    problem = PDDLProblem(domain=DOMAIN, problem=PROBLEM2)
+    #problem = PDDLProblem(domain=DOMAIN, problem=PROBLEM2)
+    problem = PDDLProblem(domain='domain.pddl', problem=problem_name, relaxed=False)
 
     # perform bfs
-    #[best_node, best_plan, resources] = breadth_first_search(problem=problem, iter_limit=1000, logging=False)
+    [best_node, best_plan, resources] = breadth_first_search(problem=problem, logging=False)
 
-    #print_results(info='breadth_first_search', node=best_node, plan=best_plan, resources=resources)
-    #[best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
+    print_results(info='breadth_first_search', node=best_node, plan=best_plan, resources=resources)
+    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=goal_heuristic, logging=False, use_closed_list=True)
 
-    #print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
+    print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
 
 
 
-    #[best_node, best_plan, resources] = best_first_search(problem=problem,
-    #                                                      frontier=PriorityQueue(eval_func=zero_heuristic),
-    #                                                      termination_criteria=[CriteriaGoalState()],
-    #                                                      prune_func=None, is_anytime=False, iter_limit=10000,
-    #                                                      time_limit=None, logging=False)
+    [best_node, best_plan, resources] = best_first_search(problem=problem,
+                                                          frontier=PriorityQueue(eval_func=zero_heuristic),
+                                                          termination_criteria=[CriteriaGoalState()],
+                                                          prune_func=None, is_anytime=False, iter_limit=None,
+                                                          time_limit=None, logging=False)
 
-    #print_results(info='best_first_search',node=best_node, plan=best_plan, resources=resources)
+    print_results(info='best_first_search',node=best_node, plan=best_plan, resources=resources)
 
-    #[best_node, best_plan, resources] = depth_first_search(problem=problem,use_closed_list=True, iter_limit=100, logging=False)
+    [best_node, best_plan, resources] = depth_first_search(problem=problem,use_closed_list=True, iter_limit=None, logging=False)
 
-    #print_results(info='depth_first_search', node=best_node, plan=best_plan, resources=resources)
+    print_results(info='depth_first_search', node=best_node, plan=best_plan, resources=resources)
 
-    #[best_node, best_plan, resources] = depth_first_search_l(problem=problem, depth_bound=2, use_closed_list=True, logging=False)
+    [best_node, best_plan, resources] = depth_first_search_l(problem=problem, depth_bound=2, use_closed_list=True, logging=False)
 
-    #print_results(info='depth_first_search_l', node=best_node, plan=best_plan, resources=resources)
+    print_results(info='depth_first_search_l', node=best_node, plan=best_plan, resources=resources)
 
-    #[best_node, best_plan, resources] = uniform_cost_search(problem=problem, use_closed_list=True, logging=False)
+    [best_node, best_plan, resources] = uniform_cost_search(problem=problem, use_closed_list=True, logging=False)
 
-    #print_results(info='uniform_cost_search', node=best_node, plan=best_plan, resources=resources)
+    print_results(info='uniform_cost_search', node=best_node, plan=best_plan, resources=resources)
 
     [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic2, logging=False, use_closed_list=True)
 
@@ -117,14 +116,14 @@ def test_gym_search():
 
     # perform best_first_serch
     # perform bfs
-    [best_node, best_plan, resources] = breadth_first_search(problem=problem, iter_limit=1000, logging=False)
+    [best_node, best_plan, resources] = breadth_first_search(problem=problem, iter_limit=None, logging=False)
 
     print_results(info='breadth_first_search', node=best_node, plan=best_plan, resources=resources)
 
     problem.apply_plan(plan=best_plan,render=True)
 
-def test_relaxed():
-    problem = PDDLProblem(domain='domain.pddl', problem='problem0.2.pddl', relaxed=False)
+def test_relaxed(problem_name):
+    problem = PDDLProblem(domain='domain.pddl', problem=problem_name, relaxed=False)
     #problem = PDDLProblem(domain=DOMAIN, problem=PROBLEM2, relaxed=False)
 
     #best_node, best_plan, resources = breadth_first_search(
@@ -146,13 +145,24 @@ def test_relaxed():
     #print_results(info='a_star with goal heuristic', node=best_node, plan=best_plan, resources=resources)
 
 
+    [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic, logging=False, use_closed_list=True)
+
+    print_results(info='a_star with my heuristic', node=best_node, plan=best_plan, resources=resources)
+
+
+
     [best_node, best_plan, resources] = a_star(problem=problem, heuristic_func=my_heuristic2, logging=False, use_closed_list=True)
 
     print_results(info='a_star with my heuristic2', node=best_node, plan=best_plan, resources=resources)
 
 
 
+
 if __name__ == "__main__":
-    #test_pddl_search()
     #test_gym_search()
-    test_relaxed()
+    print("test_relaxed('problem0.2.pddl'")
+    test_pddl_search('problem0.2.pddl')
+    test_relaxed('problem0.2.pddl')
+    print("test_relaxed('problem0.5.pddl'")
+    test_pddl_search('problem0.5.pddl')
+    test_relaxed('problem0.5.pddl')
