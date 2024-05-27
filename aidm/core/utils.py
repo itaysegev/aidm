@@ -9,7 +9,7 @@ handlers = [logging.FileHandler('aidm.log'), logging.StreamHandler()]
 logging.basicConfig(level = logging.DEBUG, handlers = handlers)
 
 
-from typing import TypedDict, Any
+from typing import NamedTuple, Any
 
 
 
@@ -17,11 +17,11 @@ from typing import TypedDict, Any
 from abc import ABC, abstractmethod
 
 
-class Action(TypedDict):
+class Action(NamedTuple):
     key: Any  # a hashable and equatable value for identifying unique actions
     content: Any  # the actual action value indiginous to the specific problem/env
 
-class State(TypedDict):
+class State(NamedTuple):
     key: Any # a hashable and equatable value for identifying unique states
     content: Any  # the problem specific state
 

@@ -41,7 +41,7 @@ def my_heuristic(node, problem):
 
 def my_heuristic2(node, problem):
     #get current state literals
-    current_state_literals = node.state['content'].literals
+    current_state_literals = node.state.content.literals
     #get goal literals
     goal_state_literals = problem.env.problems[0].goal.literals
     #check difference

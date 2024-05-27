@@ -57,9 +57,10 @@ def best_first_search(problem, frontier, termination_criteria=None, prune_func=N
             if closed_list:
                 # if the state is already in the closed list and a better value was found
                 # extract it from the closed list
-                if not closed_list.get(cur_node.state['key']) or problem.is_better(cur_value, closed_list.get(cur_node.state['key'])):
+                if not closed_list.get(cur_node.state.key) or problem.is_better(cur_value,
+                                                                                closed_list.get(cur_node.state.key)):
                     # update value in closed list
-                    closed_list.add_or_update(key=cur_node.state['key'],value=cur_value)
+                    closed_list.add_or_update(key=cur_node.state.key, value=cur_value)
                 else:
                     continue
 

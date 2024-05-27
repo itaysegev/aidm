@@ -12,7 +12,7 @@ class PDDLEnv(Env):
         return State(key=str(state),content=state)
 
     def __aidm_state_to_pddl_state(self, state: State) -> pddlState:
-        return state['content']
+        return state.content
 
     def get_current_state(self) -> State:
         return self.__pddl_state_to_aidm_state(self.env.get_state())

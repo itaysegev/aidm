@@ -32,7 +32,7 @@ class GymnasiumProblem(Problem):
 
     def _get_successors(self, state, action) -> list[tuple[State, float]]:
         successors = []
-        raw_transitions = self.env._get_successor_states(state['content'], action['content'], self.env.domain,
+        raw_transitions = self.env._get_successor_states(state.content, action.content, self.env.domain,
                                                          inference_mode=self.env._inference_mode,
                                                          raise_error_on_invalid_action=self.env._raise_error_on_invalid_action,
                                                          return_probs=True)
@@ -41,7 +41,7 @@ class GymnasiumProblem(Problem):
 
 
     def is_goal_state(self, state: State):
-        return self.env._is_goal_reached(state['content'])
+        return self.env._is_goal_reached(state.content)
 
     def apply_action(self, action):
         return self.env.step(action)

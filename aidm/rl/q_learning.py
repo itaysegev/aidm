@@ -1,100 +1,109 @@
-from collections import defaultdict
 import random
-from ..core.utils import State, Action
+import sys
+from collections import defaultdict
+from typing import Any
+
 import numpy as np
+
+
 # based on
-#https://www.gocoder.one/blog/rl-tutorial-with-openai-gym
-#https://github.com/chenmagi/q-cartpole-td0
+# https://www.gocoder.one/blog/rl-tutorial-with-openai-gym
+# https://github.com/chenmagi/q-cartpole-td0
 
-def q_learning(problem, default_value=lambda: defaultdict(float), learning_rate = 0.9, discount_rate = 0.8, epsilon = 1.0, decay_rate= 0.005, num_episodes = 1000, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
-    q_table = defaultdict(default_value)
-    q_table = train(problem.env, q_table, learning_rate, discount_rate, epsilon, decay_rate, num_episodes, max_steps_per_episode, log, log_file)
-    return q_table
+class QLearning:
+    def __init__(self, init_table: dict[Any, dict[Any, float]] = None, learning_rate=0.9, epsilon=1.0,
+                 epsilon_decay=0.9999, discount_factor=0.8, log=False, log_file=None):
 
-def evaluate_q_table(env, q_table, max_steps_per_episode = 99, num_of_trials= 100, log=False, log_file=None):
-    evaluate(env, q_table, max_steps_per_episode, num_of_trials)
+        self.learning_rate = learning_rate
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
+        self.discount_factor = discount_factor
+        self.log = log
+        self.log_file = log_file
 
-def train(env, q_table, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000, max_steps_per_episode=99, log=False, log_file=None):
+        # initialize q-value table with initial values (if provided)
+        self.q_table = defaultdict(lambda: defaultdict(float))
+        if init_table is not None:
+            for key in init_table:
+                self.q_table[key].update(init_table[key])
 
-    # training
-    for episode in range(num_episodes):
+        # action map for converting action keys to full actions
+        self._action_map = {}
 
-        # reset the environment
-        state = env.reset()[0]
-        for step in range(max_steps_per_episode):
+    def train(self, env, num_episodes=1000, max_steps_per_episode=99, eval_every=None, eval_kwargs=None, pbar=True):
+        pbar_fn = self.__get_pbar(pbar, desc='evaluating', leave=True)
 
-            # exploration-exploitation tradeoff
-            if random.uniform(0,1) < epsilon:
-                # explore
-                action = env.action_space.sample(state)
-            else:
-                # exploit
-                action = max(q_table[state],key=lambda action:q_table[state][action])
+        history = []
+        eval_args = eval_kwargs or {}
+        for episode in pbar_fn(range(num_episodes)):
+            obs, info = env.reset()
+            for step in range(max_steps_per_episode):
+                obs, done = self._training_step(env, obs)
+                if done:
+                    break
+            if eval_every is not None and (episode + 1) % eval_every == 0:
+                history.append(self.evaluate(env, **eval_args, _leave_pbar=False))
 
-            # take action and observe reward
-            [new_state, reward, terminated, truncated, info] = env.step(action)
+        return history
 
-            # Q-learning update
-            #q_table[state['key']][action['key']] += learning_rate * (reward + discount_rate * max(q_table[new_state['key']].values()) - q_table[state['key']][action['key']])
-            q_table[state][action] += learning_rate * (reward + discount_rate * max(q_table[new_state].values()) - q_table[state][action])
+    def _training_step(self, env, obs):
+        action = self.choose_action(env, obs)
+        next_obs, r, term, trunc, info = env.step(action)
+        best_next_action = self.choose_action(env, next_obs)
 
-            # Update to our new state
-            state = new_state
+        update = r + self.discount_factor * self.q_table[next_obs][best_next_action] - self.q_table[obs][action]
 
-            # if done, finish episode
-            if terminated:
-                break
+        self.q_table[obs][action] += self.learning_rate * update
 
-        # decrease epsilon
-        epsilon *= np.exp(-decay_rate)
+        self.epsilon *= self.epsilon_decay
 
-    print(f"Training completed over {num_episodes} episodes")
-    return q_table
+        return next_obs, term or trunc
 
-def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= False, log=False, log_file=None):
+    def choose_action(self, env, obs, deterministic=False):
+        if (not deterministic and random.uniform(0, 1) < self.epsilon) or not self.q_table[obs]:
+            # explore
+            return env.action_space.sample(obs)
+            #TODO the gym API does not require the current state to sample actions.
+            # must find a way to sample actions without it in pddlgymnasium.
+        else:
+            return max(self.q_table[obs].keys(), key=lambda action: self.q_table[obs][action])
 
-    state = problem.reset_env()
-    rewards = 0
-    for trial in range(num_of_trials):
-        for s in range(max_steps_per_episode):
+    def evaluate(self, env, num_episodes=1, max_steps_per_episode=1000, aggregate_episode_rewards=False, render=False,
+                 pbar=True, _leave_pbar=True):
+        pbar_fn = self.__get_pbar(pbar, desc='evaluating', leave=_leave_pbar)
 
-            #print(f"TRAINED AGENT")
-            #print("Step {}".format(s+1))
-
-            # get highest value action from the q table
-            action = np.argmax(qtable[state,:])
-
-            # perform action
-            [new_obs, reward, terminated, truncated, info] = problem.env.step(action)
-            rewards += reward
+        episode_rewards = []
+        for episode in pbar_fn(range(num_episodes)):
+            acc_rewards = 0
+            obs, info = env.reset()
             if render:
-                problem.env.render()
-                print(f"score: {rewards}")
-            state = new_obs
-            if terminated == True:
-                break
-    print(f"Average rewards: {rewards/num_of_trials}" )
+                env.render()
+            for step in range(max_steps_per_episode):
+                action = self.choose_action(env, obs, deterministic=True)
+                obs, r, term, trunc, info = env.step(action)
+                if render:
+                    env.render()
+                acc_rewards += self.discount_factor ** step * r
+                if term or trunc:
+                    break
+            episode_rewards.append(acc_rewards)
 
-def get_max_action(qtable,state):
+        if aggregate_episode_rewards:
+            return np.mean(episode_rewards)
+        else:
+            return episode_rewards
 
-    state = problem.reset_env()
-    rewards = 0
-    for trial in range(num_of_trials):
-        for s in range(max_steps_per_episode):
+    def to_policy(self, env, deterministic=True):
+        return lambda obs: self.choose_action(env, obs, deterministic=deterministic)
 
-            #print(f"TRAINED AGENT")
-            #print("Step {}".format(s+1))
-
-            # get highest value action from the q table
-            action = np.argmax(qtable[state,:])
-
-            # perform action
-            [new_obs, reward, terminated, truncated, info] = problem.env.step(action)
-            rewards += reward
-            if render:
-                problem.env.render()
-                print(f"score: {rewards}")
-            state = new_obs
-            if terminated == True:
-                break
-    print(f"Average rewards: {rewards/num_of_trials}" )
+    @staticmethod
+    def __get_pbar(pbar, desc='', leave=False):
+        if pbar:
+            try:
+                from tqdm.auto import tqdm
+            except ImportError:
+                print('to show a progressbar, you must first install tqdm: `pip install tqdm`', file=sys.stderr)
+                raise
+            return lambda x: tqdm(x, leave=leave)
+        else:
+            return lambda x: x

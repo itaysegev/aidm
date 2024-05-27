@@ -24,8 +24,8 @@ def test_taxi_q_learning():
 
     # perform q_learning
     #[best_value, best_node, best_plan, explored_count, ex_terminated] = \
-    q_learning(problem=taxi_p,learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000,
-                   max_steps_per_episode=99,  num_of_trials=100, log=False, log_file=None)
+    q_learning(problem=taxi_p, learning_rate=0.9, discount_factor=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000,
+               max_steps_per_episode=99, num_of_trials=100, log=False, log_file=None)
 
     #print(best_plan)
     #for action_id in best_plan:

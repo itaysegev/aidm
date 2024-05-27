@@ -36,8 +36,8 @@ class PDDLProblem(Problem):
         return State(key=self.state_to_key(self.initial_state), content=self.initial_state)
 
     def set_initial_state(self, state:State):
-        self.initial_state = state['content']
-        self.env.set_state(state['content'])
+        self.initial_state = state.content
+        self.env.set_state(state.content)
 
     def sample_action(self, state: State) -> Action:
         # convert ai_dm state to pddl state
@@ -47,7 +47,7 @@ class PDDLProblem(Problem):
 
 
     def convert_state(self, state: State):
-        return state['content']
+        return state.content
 
     def state_to_key(self, state):
         literals = sorted(state.literals)
@@ -71,14 +71,14 @@ class PDDLProblem(Problem):
 
     def get_applicable_actions(self, state:State)-> list[Action]:
         actions = []
-        grounded_actions = self.env.action_space.all_ground_literals(state['content'])
+        grounded_actions = self.env.action_space.all_ground_literals(state.content)
         for action in grounded_actions:
             actions.append(Action(key=action,content=action))
         return actions
 
     def _get_successors(self, pre_state, action)  -> list[tuple[State, float]]:
         successors = []
-        raw_transitions = self.env._get_successor_states(pre_state['content'], action['content'], self.env.domain,
+        raw_transitions = self.env._get_successor_states(pre_state.content, action.content, self.env.domain,
                                             inference_mode=self.env._inference_mode,
                                             raise_error_on_invalid_action=self.env._raise_error_on_invalid_action,
                                                          return_probs=True)
@@ -106,10 +106,10 @@ class PDDLProblem(Problem):
         return self.get_cost(state=state, action=action, next_state=next_state)
 
     def is_goal_state(self, state:State):
-        return self.env._is_goal_reached(state['content'])
+        return self.env._is_goal_reached(state.content)
 
     def apply_action(self, action):
-        return self.env.step(action['content'])
+        return self.env.step(action.content)
 
     def reset_env(self):
         self.initial_state, _ = self.env.reset()
