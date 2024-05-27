@@ -109,7 +109,8 @@ class PDDLProblem(Problem):
         return self.env._is_goal_reached(state.content)
 
     def apply_action(self, action):
-        return self.env.step(action.content)
+        s, r, term, trunc, info = self.env.step(action.content)
+        return State(key=s, content=s)
 
     def reset_env(self):
         self.initial_state, _ = self.env.reset()
