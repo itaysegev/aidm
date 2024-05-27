@@ -139,6 +139,9 @@ def a_star(problem, heuristic_func, use_closed_list=False, iter_limit=None, time
                              termination_criteria=[CriteriaGoalState()], prune_func=None, use_closed_list=use_closed_list, iter_limit=iter_limit,
                              time_limit=time_limit, depth_bound=None, logging=logging)
 
+def weighted_a_star(problem, heuristic_func, weight, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
+    return a_star(problem, lambda x,y: weight*heuristic_func(x,y), use_closed_list, iter_limit, time_limit, logging)
+
 def greedy_best_first_search(problem, heuristic_func, use_closed_list=False, iter_limit=None, time_limit=None, logging=False):
     # f_func is equal to h
     return best_first_search(problem=problem, frontier=aidm.search.frontier.PriorityQueue(heuristic_func),
