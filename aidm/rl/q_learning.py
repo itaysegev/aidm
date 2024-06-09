@@ -104,6 +104,6 @@ class QLearning:
             except ImportError:
                 print('to show a progressbar, you must first install tqdm: `pip install tqdm`', file=sys.stderr)
                 raise
-            return lambda x: tqdm(x, leave=leave)
+            return lambda x: tqdm(x, desc=desc, leave=leave)
         else:
             return lambda x: x
