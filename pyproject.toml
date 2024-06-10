@@ -25,6 +25,7 @@ dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
 gym = ["gymnasium"]
+taxi = ["multi-taxi@git+https://github.com/CLAIR-LAB-TECHNION/multi-taxi"]
 pddl = ["pddlgymnasium@git+https://github.com/CLAIR-LAB-TECHNION/pddlgymnasium"]
 
 [project.urls]
